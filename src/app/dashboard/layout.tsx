@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ReduxProvider from "@/store/provider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import logo from "@/assets/mycleanone_logo.png";
 
 const sidebarLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -48,12 +49,15 @@ export default function DashboardLayout({
                 />
               </svg>
             </button>
-            <span className="w-8 h-8 bg-[var(--primary)] rounded-full flex items-center justify-center text-white font-bold text-xl">
-              PL
-            </span>
-            <span className="font-bold text-xl tracking-tight text-center">
-              Pro Licensing Platform
-            </span>
+            <img
+              src={logo.src}
+              alt="MyCleanOne Logo"
+              className="h-14 w-auto"
+              style={{ maxWidth: "250px" }}
+            />
+            {/* <span className="font-bold text-xl tracking-tight text-center">
+              My Clean One
+            </span> */}
           </div>
         </header>
         <div className="flex flex-1 min-h-0">
@@ -135,9 +139,9 @@ export default function DashboardLayout({
         </div>
         {/* Minimal footer */}
         <footer className="w-full py-4 px-6 bg-[var(--surface)] text-center text-xs text-[var(--foreground)]/60 mt-auto border-t border-[var(--border)]">
-          &copy; {new Date().getFullYear()} Pro Licensing Platform. Need help?{" "}
+          &copy; {new Date().getFullYear()} My Clean One. Need help?{" "}
           <a
-            href="mailto:support@yourdomain.com"
+            href="mailto:support@mycleanone.com"
             className="text-[var(--link)] hover:underline"
           >
             Contact Support

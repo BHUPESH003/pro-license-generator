@@ -56,7 +56,7 @@ function buildLicenseEmail({
         ? "To reactivate, please update your payment method or renew your subscription."
         : "Enter these keys in your ProApp client to activate your software. If you need more devices, you can upgrade anytime.",
     support:
-      "If you have any questions, reply to this email or contact support@yourdomain.com.",
+      "If you have any questions, reply to this email or contact support@mycleanone.com.",
     status,
   };
 }

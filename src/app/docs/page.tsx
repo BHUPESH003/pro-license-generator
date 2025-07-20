@@ -6,7 +6,7 @@ export default function DocsPage() {
     <div className="max-w-3xl mx-auto py-12 px-4">
       <h1 className="text-4xl font-bold mb-4 text-center">Documentation</h1>
       <p className="text-center text-[var(--foreground)]/70 mb-10">
-        Get started with Pro Licensing Platform. Find guides, API docs, and
+        Get started with My Clean One Platform. Find guides, API docs, and
         support resources below.
       </p>
       <section className="mb-10">
@@ -41,10 +41,10 @@ export default function DocsPage() {
         <p className="text-[var(--foreground)]/70 text-sm">
           For API integration or advanced use cases, contact{" "}
           <a
-            href="mailto:support@yourdomain.com"
+            href="mailto:support@mycleanone.com"
             className="text-[var(--link)] hover:underline"
           >
-            support@yourdomain.com
+            support@mycleanone.com
           </a>
           .
         </p>
@@ -61,10 +61,10 @@ export default function DocsPage() {
         <p className="text-[var(--foreground)]/70 text-sm">
           Email:{" "}
           <a
-            href="mailto:support@yourdomain.com"
+            href="mailto:support@mycleanone.com"
             className="text-[var(--link)] hover:underline"
           >
-            support@yourdomain.com
+            support@mycleanone.com
           </a>
         </p>
       </section>

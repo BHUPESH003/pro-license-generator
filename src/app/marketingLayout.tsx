@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import logo from "@/assets/mycleanone_logo.png";
 
 const navLinks = [
   { href: "/marketing", label: "Home" },
@@ -46,7 +47,12 @@ export default function MarketingLayout({
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <header className="w-full py-4 px-6 shadow bg-[var(--surface)] flex items-center justify-between rounded-b-2xl relative">
-        <span className="font-bold text-xl">Pro Licensing Platform</span>
+        <img
+          src={logo.src}
+          alt="MyCleanOne Logo"
+          className="h-16 w-auto"
+          style={{ maxWidth: "250px" }}
+        />
         <nav className="hidden sm:flex gap-2 sm:gap-4">
           {navLinks.map((link) => (
             <Link
@@ -221,8 +227,7 @@ export default function MarketingLayout({
           </a>
         </div>
         <div className="text-xs text-[var(--foreground)]/50">
-          &copy; {new Date().getFullYear()} Pro Licensing Platform. All rights
-          reserved.
+          &copy; {new Date().getFullYear()} My Clean One. All rights reserved.
         </div>
       </footer>
     </div>
