@@ -29,9 +29,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    console.log("[CREATE PASSWORD] Plain password:", password);
     user.password = password; // <-- Assign plain password, let model hash it
-    console.log("[CREATE PASSWORD] User password set for:", user.password);
     await user.save();
     return NextResponse.json({ message: "Password set successfully." });
   } catch (error) {
