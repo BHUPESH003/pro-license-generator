@@ -3,10 +3,7 @@ import dbConnect from "@/lib/db";
 import License from "@/models/License";
 import jwt from "jsonwebtoken";
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, context: any) {
   const { id } = await context.params;
   const token = req.cookies.get("token")?.value;
   if (!token) {

@@ -1,11 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import axios from "@/lib/axios";
 
-export default function CreatePasswordPage() {
+function CreatePasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
   const [password, setPassword] = useState("");
@@ -61,14 +61,22 @@ export default function CreatePasswordPage() {
           {loading ? "Setting..." : "Set Password"}
         </Button>
       </form>
-      <div className="mt-6 text-center">
+      <div className="mt-4 text-sm text-center">
         <a
-          href="/marketing"
-          className="inline-block px-4 py-2 rounded-lg bg-[var(--secondary)] text-[var(--link)] font-semibold hover:bg-[var(--card)] transition"
+          href="/login"
+          className="text-[var(--link)] hover:underline font-medium"
         >
-          Return to Home
+          Back to login
         </a>
       </div>
     </div>
+  );
+}
+
+export default function CreatePasswordPage() {
+  return (
+    <Suspense>
+      <CreatePasswordForm />
+    </Suspense>
   );
 }

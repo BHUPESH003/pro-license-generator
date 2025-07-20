@@ -8,10 +8,7 @@ import jwt from "jsonwebtoken";
  * @desc    Deactivates a specific license for the authenticated user
  * @access  Private
  */
-export async function POST(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, context: any) {
   // Correctly access the 'id' from the context parameters
   const { id } = await context.params;
 

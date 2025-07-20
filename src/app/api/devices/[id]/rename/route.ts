@@ -5,8 +5,12 @@ import jwt from "jsonwebtoken";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  // Change the second argument to this standard format
+  context: any
 ) {
+  // Access params through the context object
+  const { id } = context.params;
+
   const token = req.cookies.get("token")?.value;
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -28,11 +32,16 @@ export async function POST(
     );
   }
   await dbConnect();
-  const license = await License.findOne({ deviceId: params.id, userId });
+
+  // Find the license using the `id` from context.params
+  const license = await License.findOne({ deviceId: id, userId });
   if (!license) {
     return NextResponse.json({ error: "Device not found" }, { status: 404 });
   }
+
+  // Rename the deviceId and save
   license.deviceId = newName;
   await license.save();
+
   return NextResponse.json({ message: "Device renamed", deviceId: newName });
 }
