@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
         // Send all license keys in the email
         await sendEmailToSQS({
           email,
-          template: "license-key",
+          template: "renderLicenseKeyTemplate",
           data: buildLicenseEmail({
             user,
             licenseKeys,
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
         const licenseKeys = licenses.map((l) => l.licenseKey);
         await sendEmailToSQS({
           email: user.email,
-          template: "license-key",
+          template: "renderLicenseKeyTemplate",
           data: buildLicenseEmail({
             user,
             licenseKeys,
@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
         const licenseKeys = licenses.map((l) => l.licenseKey);
         await sendEmailToSQS({
           email: user.email,
-          template: "license-key",
+          template: "renderLicenseKeyTemplate",
           data: buildLicenseEmail({
             user,
             licenseKeys,
@@ -262,7 +262,7 @@ export async function POST(req: NextRequest) {
       const licenseKeys = updatedLicenses.map((l) => l.licenseKey);
       await sendEmailToSQS({
         email: user.email,
-        template: "license-key",
+        template: "renderLicenseKeyTemplate",
         data: buildLicenseEmail({
           user,
           licenseKeys,

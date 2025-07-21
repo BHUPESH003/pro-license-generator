@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     try {
       await sendEmailToSQS({
         email,
-        template: "password-setup",
+        template: "renderPasswordSetupTemplate",
         data: {
           setupUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/create-password?token=${token}`,
         },

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       // Send reset email via SQS
       await sendEmailToSQS({
         email,
-        template: "password-reset",
+        template: "renderPasswordResetTemplate",
         data: {
           resetUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${token}`,
         },
