@@ -188,11 +188,11 @@ export default function MarketingLayout({
           </Link>
         </div>
         <div className="flex gap-4 justify-center mb-2">
-          <a href="mailto:support@yourdomain.com" className="hover:underline">
-            support@yourdomain.com
+          <a href="mailto:support@mycleanone.com" className="hover:underline">
+            support@mycleanone.com
           </a>
           <span>|</span>
-          <span>+1-234-567-8901</span>
+          <span>+91 8950798051</span>
         </div>
         <div className="flex gap-4 justify-center">
           <a
