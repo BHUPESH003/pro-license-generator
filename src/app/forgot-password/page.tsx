@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import axios from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
     setError("");
     setSuccess("");
     try {
-      await axios.post("/api/auth/forgot-password", { email });
+      await apiClient.post("/api/auth/forgot-password", { email });
       setSuccess(
         "If an account exists for this email, a password reset link has been sent."
       );

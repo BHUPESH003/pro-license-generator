@@ -1,22 +1,25 @@
 import axios from "axios";
-import { store } from "../store/store";
 
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+let accessToken: string | null = null;
 
-// Correctly create the custom instance with all its configurations
-const api = axios.create({
-  baseURL,
-  withCredentials: true, // ✅ Set credentials config here
+export const setAccessToken = (token: string | null) => {
+  localStorage.setItem("accessToken", token || "");
+};
+
+export const getAccessToken = () => {
+  const token = localStorage.getItem("accessToken");
+  return token;
+};
+
+const apiClient = axios.create({
+  baseURL: "", // Your API base URL
 });
 
-// Request interceptor to add auth token from Redux store
-api.interceptors.request.use(
+// Request Interceptor: Adds the access token to every outgoing request
+apiClient.interceptors.request.use(
   (config) => {
-    const state = store.getState();
-    const token = state.auth?.token;
+    const token = getAccessToken();
     if (token) {
-      // Ensure headers object exists before assigning
-      config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
@@ -24,20 +27,33 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle global 401 errors
-api.interceptors.response.use(
+// Response Interceptor: Handles 401 errors by refreshing the token
+apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // Check if it's a 401 Unauthorized error
-    if (error.response && error.response.status === 401) {
-      // Ensure this code runs only on the client-side
-      if (typeof window !== "undefined") {
-        // Redirect to login page for re-authentication
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If the error is 401 and we haven't retried yet
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const { data } = await axios.post("/api/auth/refresh-token");
+        setAccessToken(data.accessToken);
+
+        // Update the header and retry the original request
+        originalRequest.headers["Authorization"] = `Bearer ${data.accessToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        // Refresh token failed, logout the user
+        setAccessToken(null);
+        // Redirect to login page
         window.location.href = "/login";
+        return Promise.reject(refreshError);
       }
     }
     return Promise.reject(error);
   }
 );
 
-export default api;
+export default apiClient;

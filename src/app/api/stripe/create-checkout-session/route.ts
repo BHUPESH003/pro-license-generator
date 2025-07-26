@@ -1,20 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import stripe from "@/lib/stripe";
-import jwt from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
   try {
     const { plan, quantity } = await req.json();
-    // Get user email from token
-    const token = req.cookies.get("token")?.value;
-    if (!token)
+    const userEmail = req.headers.get("x-user-email");
+    if (!userEmail) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    let userEmail = null;
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      userEmail = (decoded as any).email;
-    } catch {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     // Select priceId based on plan

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
-import axios from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +29,7 @@ export default function RegisterPage() {
       return;
     }
     try {
-      await axios.post("/api/auth/register", { email, password });
+      await apiClient.post("/api/auth/register", { email, password });
       setSuccess(
         "Registration successful! Please check your email to set your password."
       );

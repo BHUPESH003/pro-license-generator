@@ -1,37 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import License from "@/models/License";
-import jwt from "jsonwebtoken";
+import Device from "@/models/Device";
 
 export async function POST(req: NextRequest, context: any) {
-  const { id } = await context.params;
-  const token = req.cookies.get("token")?.value;
-  if (!token) {
+  const { id: licenseId } = context.params;
+  const userId = req.headers.get("x-user-id");
+  const { name, os } = await req.json();
+
+  if (!userId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  let userId;
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      userId: string;
-    };
-    userId = decoded.userId;
-  } catch {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-  }
-  const { deviceId } = await req.json();
-  if (!deviceId) {
+  if (!name || !os)
     return NextResponse.json(
-      { error: "Device ID is required" },
+      { error: "Missing device name or OS" },
       { status: 400 }
     );
-  }
+
   await dbConnect();
-  const license = await License.findOne({ _id: id, userId });
-  if (!license) {
+
+  const license = await License.findOne({ _id: licenseId, userId });
+  if (!license)
     return NextResponse.json({ error: "License not found" }, { status: 404 });
-  }
-  license.deviceId = deviceId;
+
+  const device = await Device.create({
+    name,
+    os,
+    userId,
+    licenseId,
+  });
+
   license.status = "active";
   await license.save();
-  return NextResponse.json({ message: "License activated", license });
+
+  return NextResponse.json({ message: "License activated", device });
 }

@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import axios from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 export default function DevicesPage() {
   const [devices, setDevices] = useState<any[]>([]);
@@ -16,7 +16,7 @@ export default function DevicesPage() {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get("/api/devices");
+        const res = await apiClient.get("/api/devices");
         setDevices(res.data.devices || []);
       } catch (err: any) {
         setError(err.response?.data?.error || "Failed to load devices");
@@ -31,7 +31,7 @@ export default function DevicesPage() {
     if (!renameValue) return;
     setActionLoading(deviceId);
     try {
-      await axios.post(`/api/devices/${deviceId}/rename`, {
+      await apiClient.post(`/api/devices/${deviceId}/rename`, {
         newName: renameValue,
       });
       setDevices((prev) =>
@@ -53,7 +53,7 @@ export default function DevicesPage() {
       return;
     setActionLoading(deviceId);
     try {
-      await axios.post(`/api/devices/${deviceId}/deactivate`);
+      await apiClient.post(`/api/devices/${deviceId}/deactivate`);
       setDevices((prev) => prev.filter((d) => d.deviceId !== deviceId));
     } catch (err: any) {
       alert(err.response?.data?.error || "Deactivation failed");

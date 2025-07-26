@@ -41,18 +41,31 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const token = jwt.sign(
+    // Create Access Token (short-lived)
+    const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET!,
-      { expiresIn: "7d" }
+      { expiresIn: "15m" } // 15 minutes
+    );
+
+    // Create Refresh Token (long-lived)
+    const refreshToken = jwt.sign(
+      { userId: user._id }, // Keep payload minimal
+      process.env.JWT_REFRESH_SECRET!,
+      { expiresIn: "7d" } // 7 days
     );
 
     // Set cookie in response
-    const response = NextResponse.json({ success: true }, { status: 200 });
+    const response = NextResponse.json(
+      { success: true, accessToken },
+      { status: 200 }
+    );
 
-    response.cookies.set("token", token, {
+    // Set the refresh token in a secure, httpOnly cookie
+    response.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       path: "/",
+      // secure: true should be used in production
       maxAge: 7 * 24 * 60 * 60, // 7 days
       sameSite: "lax",
       secure: process.env.NODE_ENV !== "development",

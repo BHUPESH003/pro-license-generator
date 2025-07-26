@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import axios from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 export default function MarketingLandingPage() {
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,7 @@ export default function MarketingLandingPage() {
   const handleBuyPro = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("/api/stripe/create-checkout-session", {
+      const res = await apiClient.post("/api/stripe/create-checkout-session", {
         plan: "pro",
       });
       window.location.href = res.data.url;

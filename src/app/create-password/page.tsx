@@ -3,7 +3,7 @@ import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import axios from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 function CreatePasswordForm() {
   const searchParams = useSearchParams();
@@ -25,7 +25,7 @@ function CreatePasswordForm() {
     }
     setLoading(true);
     try {
-      await axios.post("/api/auth/create-password", { token, password });
+      await apiClient.post("/api/auth/create-password", { token, password });
       setSuccess("Password set successfully! Redirecting to login...");
       setTimeout(() => router.push("/login"), 2000);
     } catch (err: any) {

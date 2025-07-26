@@ -52,6 +52,7 @@ export default function MarketingLayout({
           alt="MyCleanOne Logo"
           className="h-16 w-auto"
           style={{ maxWidth: "250px" }}
+          onClick={() => router.push("/")}
         />
         <nav className="hidden sm:flex gap-2 sm:gap-4">
           {navLinks.map((link) => (

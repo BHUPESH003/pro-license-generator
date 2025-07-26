@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import axios from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 const downloads = [
   {
@@ -40,7 +40,7 @@ export default function DownloadsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number>(1);
   const [plan, setPlan] = useState("monthly");
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function DownloadsPage() {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get("/api/licenses");
+        const res = await apiClient.get("/api/licenses");
         const licenses = res.data.licenses || [];
         setHasLicense(licenses.some((l: any) => l.status === "active"));
       } catch (err: any) {
@@ -65,7 +65,7 @@ export default function DownloadsPage() {
   const handleBuy = async () => {
     setCheckoutLoading(true);
     try {
-      const res = await axios.post("/api/stripe/create-checkout-session", {
+      const res = await apiClient.post("/api/stripe/create-checkout-session", {
         plan,
         quantity,
       });
@@ -187,9 +187,20 @@ export default function DownloadsPage() {
               min={1}
               max={10}
               value={quantity}
-              onChange={(e) =>
-                setQuantity(Math.max(1, Math.min(10, Number(e.target.value))))
-              }
+              onChange={(e) => {
+                const value = e.target.value;
+                // Allow empty string or valid number input
+                if (value === "" || /^[0-9\b]+$/.test(value)) {
+                  setQuantity(Number(value));
+                }
+              }}
+              onBlur={() => {
+                const numericValue = Math.max(
+                  1,
+                  Math.min(10, Number(quantity))
+                );
+                setQuantity(numericValue);
+              }}
               className="w-16 px-2 py-1 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)]"
             />
           </div>

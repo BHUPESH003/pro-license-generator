@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import stripe from "@/lib/stripe";
-import { buffer } from "micro";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import License from "@/models/License";

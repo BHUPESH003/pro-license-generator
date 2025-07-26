@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import axios from "@/lib/axios";
+import apiClient from "@/lib/axios";
 
 export default function LicensesPage() {
   const [licenses, setLicenses] = useState<any[]>([]);
@@ -15,7 +15,7 @@ export default function LicensesPage() {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get("/api/licenses");
+        const res = await apiClient.get("/api/licenses");
         setLicenses(res.data.licenses || []);
       } catch (err: any) {
         setError(err.response?.data?.error || "Failed to load licenses");
@@ -37,7 +37,7 @@ export default function LicensesPage() {
     if (!deviceId) return;
     setActionLoading(id);
     try {
-      await axios.post(`/api/licenses/${id}/activate`, { deviceId });
+      await apiClient.post(`/api/licenses/${id}/activate`, { deviceId });
       setLicenses((prev) =>
         prev.map((l) =>
           l._id === id ? { ...l, deviceId, status: "active" } : l
@@ -55,7 +55,7 @@ export default function LicensesPage() {
       return;
     setActionLoading(id);
     try {
-      await axios.post(`/api/licenses/${id}/deactivate`);
+      await apiClient.post(`/api/licenses/${id}/deactivate`);
       setLicenses((prev) =>
         prev.map((l) =>
           l._id === id ? { ...l, deviceId: null, status: "inactive" } : l

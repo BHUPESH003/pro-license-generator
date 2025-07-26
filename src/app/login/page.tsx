@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
-import axios from "@/lib/axios";
+import apiClient, { setAccessToken } from "@/lib/axios";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -17,10 +17,11 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post("/api/auth/login", { email, password });
+      const res = await apiClient.post("/api/auth/login", { email, password });
 
       // Only redirect if the API confirms success
       if (res.data.success) {
+        setAccessToken(res.data.accessToken);
         router.push("/dashboard");
       } else {
         // This is a fallback for unexpected responses
