@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import logo from "@/assets/mycleanone_logo.png";
+import apiClient from "@/lib/axios";
 
 const navLinks = [
   { href: "/marketing", label: "Home" },
@@ -12,11 +13,9 @@ const navLinks = [
 
 async function checkAuth() {
   try {
-    const res = await fetch("/api/auth/me");
-    if (!res.ok) return false;
-    const data = await res.json();
-    return !!data.user;
-  } catch {
+    const res = await apiClient.get("/api/auth/me");
+    return !!res.data.user;
+  } catch (err) {
     return false;
   }
 }
@@ -32,18 +31,30 @@ export default function MarketingLayout({
 
   // Check auth status on mount and when tab regains focus
   useEffect(() => {
-    const updateAuth = async () => setLoggedIn(await checkAuth());
-    updateAuth();
-    window.addEventListener("focus", updateAuth);
+    const updateAuth = async () => {
+      try {
+        const res = await apiClient.get("/api/auth/me");
+        setLoggedIn(!!res.data.user);
+      } catch {
+        setLoggedIn(false);
+      }
+    };
+
+    updateAuth(); // Initial check
+    window.addEventListener("focus", updateAuth); // Recheck on window focus
+
     return () => window.removeEventListener("focus", updateAuth);
   }, []);
-
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    setLoggedIn(false);
-    router.push("/login");
+    try {
+      await apiClient.post("/api/auth/logout");
+      localStorage.removeItem("accessToken"); // clear manually
+      setLoggedIn(false);
+      router.push("/login");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
-
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <header className="w-full py-4 px-6 shadow bg-[var(--surface)] flex items-center justify-between rounded-b-2xl relative">
