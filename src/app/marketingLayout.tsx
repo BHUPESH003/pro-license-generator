@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import logo from "@/assets/mycleanone_logo.png";
@@ -17,14 +17,19 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
+  const [loggedIn, setLoggedIn] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      setLoggedIn(!!token);
+    }
+  }, []);
   const handleLogout = async () => {
     try {
       await apiClient.post("/api/auth/logout");
       localStorage.removeItem("accessToken"); // clear manually
-      setLoggedIn(false);
       router.push("/login");
     } catch (err) {
       console.error("Logout failed:", err);

@@ -14,6 +14,7 @@ const sidebarLinks = [
 
 async function handleLogout(router: any) {
   await fetch("/api/auth/logout", { method: "POST" });
+  localStorage.removeItem("accessToken"); // clear manually
   router.push("/login");
 }
 
