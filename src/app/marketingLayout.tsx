@@ -11,15 +11,6 @@ const navLinks = [
   { href: "/docs", label: "Docs" },
 ];
 
-async function checkAuth() {
-  try {
-    const res = await apiClient.get("/api/auth/me");
-    return !!res.data.user;
-  } catch (err) {
-    return false;
-  }
-}
-
 export default function MarketingLayout({
   children,
 }: {
@@ -29,22 +20,6 @@ export default function MarketingLayout({
   const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
 
-  // Check auth status on mount and when tab regains focus
-  useEffect(() => {
-    const updateAuth = async () => {
-      try {
-        const res = await apiClient.get("/api/auth/me");
-        setLoggedIn(!!res.data.user);
-      } catch {
-        setLoggedIn(false);
-      }
-    };
-
-    updateAuth(); // Initial check
-    window.addEventListener("focus", updateAuth); // Recheck on window focus
-
-    return () => window.removeEventListener("focus", updateAuth);
-  }, []);
   const handleLogout = async () => {
     try {
       await apiClient.post("/api/auth/logout");
