@@ -2,14 +2,26 @@
 import React, { useState } from "react";
 import ReduxProvider from "@/store/provider";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  LayoutDashboard,
+  Key,
+  Smartphone,
+  Download,
+  LogOut,
+  Menu,
+  X,
+  Home,
+  Mail,
+} from "lucide-react";
 import logo from "@/assets/mycleanone_logo.png";
 
 const sidebarLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard/licenses", label: "My Licenses" },
-  { href: "/dashboard/devices", label: "My Devices" },
-  { href: "/dashboard/downloads", label: "Downloads" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/licenses", label: "My Licenses", icon: Key },
+  { href: "/dashboard/devices", label: "My Devices", icon: Smartphone },
+  { href: "/dashboard/downloads", label: "Downloads", icon: Download },
 ];
 
 async function handleLogout(router: any) {
@@ -25,129 +37,252 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
   return (
     <ReduxProvider>
-      <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         {/* Topbar */}
-        <header className="w-full flex items-center justify-between px-6 py-4 bg-[var(--surface)] shadow-md z-10">
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-lg border-b border-white/20 dark:border-slate-700/50 z-10"
+        >
           <div className="flex items-center gap-3">
-            <button
-              className="md:hidden mr-2"
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="md:hidden mr-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
               onClick={() => setSidebarOpen((o) => !o)}
               aria-label="Open sidebar"
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-            <img
-              src={logo.src}
-              alt="MyCleanOne Logo"
-              className="h-14 w-auto"
-              style={{ maxWidth: "250px" }}
-            />
-            {/* <span className="font-bold text-xl tracking-tight text-center">
-              My Clean One
-            </span> */}
+              <Menu className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+            </motion.button>
+            <div className="flex items-center gap-3">
+              <img
+                src={logo.src}
+                alt="MyCleanOne Logo"
+                className="h-12 w-auto"
+                style={{ maxWidth: "200px" }}
+              />
+              <div className="hidden sm:block h-6 w-px bg-slate-300 dark:bg-slate-600"></div>
+              <span className="hidden sm:block text-sm text-slate-600 dark:text-slate-300 font-medium">
+                Dashboard
+              </span>
+            </div>
           </div>
-        </header>
+
+          {/* User Menu */}
+          <div className="flex items-center gap-4">
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href="/marketing"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-sm font-medium text-slate-700 dark:text-slate-300"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </motion.a>
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href="mailto:support@mycleanone.com"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors text-sm font-medium text-blue-700 dark:text-blue-300"
+            >
+              <Mail className="h-4 w-4" />
+              Support
+            </motion.a>
+          </div>
+        </motion.header>
+
         <div className="flex flex-1 min-h-0">
           {/* Sidebar for md+ */}
-          <aside className="hidden md:flex flex-col w-64 bg-[var(--card)] border-r border-[var(--border)] py-8 px-4 gap-2">
+          <motion.aside
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="hidden md:flex flex-col w-72 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4"
+          >
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                Navigation
+              </h2>
+              <div className="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent"></div>
+            </div>
+
             <nav className="flex flex-col gap-2">
-              {sidebarLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="px-3 py-2 rounded-lg font-medium text-[var(--link)] hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition"
+              {sidebarLinks.map((link, index) => {
+                const isActive = pathname === link.href;
+                return (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                  >
+                    <Link
+                      href={link.href}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                        isActive
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-white"
+                      }`}
+                    >
+                      <link.icon
+                        className={`h-5 w-5 ${
+                          isActive
+                            ? "text-white"
+                            : "text-slate-500 dark:text-slate-400"
+                        }`}
+                      />
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+
+              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleLogout(router)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 w-full"
                 >
-                  {link.label}
-                </Link>
-              ))}
-              <button
-                onClick={() => handleLogout(router)}
-                className="px-3 py-2 rounded-lg font-medium text-[var(--link)] hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition text-left"
-              >
-                Logout
-              </button>
+                  <LogOut className="h-5 w-5" />
+                  Logout
+                </motion.button>
+              </div>
             </nav>
-          </aside>
+          </motion.aside>
+
           {/* Mobile sidebar drawer */}
           {sidebarOpen && (
-            <div className="fixed inset-0 z-40 flex md:hidden">
-              <div
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 flex md:hidden"
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="bg-black/40 w-full h-full"
                 onClick={() => setSidebarOpen(false)}
               />
-              <aside className="w-64 bg-[var(--card)] border-r border-[var(--border)] py-8 px-4 gap-2 flex flex-col h-full shadow-2xl animate-slide-in-left">
-                <button
-                  className="self-end mb-4"
-                  onClick={() => setSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
+              <motion.aside
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="w-80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4 flex flex-col h-full shadow-2xl"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                    Menu
+                  </h2>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                    onClick={() => setSidebarOpen(false)}
+                    aria-label="Close sidebar"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+                    <X className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+                  </motion.button>
+                </div>
+
                 <nav className="flex flex-col gap-2">
-                  {sidebarLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="px-3 py-2 rounded-lg font-medium text-[var(--link)] hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition"
-                      onClick={() => setSidebarOpen(false)}
+                  {sidebarLinks.map((link, index) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <motion.div
+                        key={link.href}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.1 }}
+                      >
+                        <Link
+                          href={link.href}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                            isActive
+                              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-white"
+                          }`}
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          <link.icon
+                            className={`h-5 w-5 ${
+                              isActive
+                                ? "text-white"
+                                : "text-slate-500 dark:text-slate-400"
+                            }`}
+                          />
+                          {link.label}
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+
+                  <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setSidebarOpen(false);
+                        handleLogout(router);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 w-full"
                     >
-                      {link.label}
-                    </Link>
-                  ))}
-                  <button
-                    onClick={() => {
-                      setSidebarOpen(false);
-                      handleLogout(router);
-                    }}
-                    className="px-3 py-2 rounded-lg font-medium text-[var(--link)] hover:bg-[var(--secondary)] hover:text-[var(--primary)] transition text-left"
-                  >
-                    Logout
-                  </button>
+                      <LogOut className="h-5 w-5" />
+                      Logout
+                    </motion.button>
+                  </div>
                 </nav>
-              </aside>
-            </div>
+              </motion.aside>
+            </motion.div>
           )}
+
           {/* Main content */}
-          <main className="flex-1 bg-[var(--background)] p-4 sm:p-8 overflow-y-auto min-h-0 flex flex-col">
-            {children}
-          </main>
-        </div>
-        {/* Minimal footer */}
-        <footer className="w-full py-4 px-6 bg-[var(--surface)] text-center text-xs text-[var(--foreground)]/60 mt-auto border-t border-[var(--border)]">
-          &copy; {new Date().getFullYear()} My Clean One. Need help?{" "}
-          <a
-            href="mailto:support@mycleanone.com"
-            className="text-[var(--link)] hover:underline"
+          <motion.main
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex-1 bg-transparent p-4 sm:p-8 overflow-y-auto min-h-0 flex flex-col"
           >
-            Contact Support
-          </a>
-        </footer>
+            {children}
+          </motion.main>
+        </div>
+
+        {/* Footer */}
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="w-full py-6 px-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-center border-t border-white/20 dark:border-slate-700/50"
+        >
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              &copy; {new Date().getFullYear()} My Clean One. All rights
+              reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <a
+                href="mailto:support@mycleanone.com"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+              >
+                Contact Support
+              </a>
+              <div className="h-4 w-px bg-slate-300 dark:bg-slate-600"></div>
+              <a
+                href="/marketing"
+                className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors"
+              >
+                Back to Home
+              </a>
+            </div>
+          </div>
+        </motion.footer>
       </div>
     </ReduxProvider>
   );

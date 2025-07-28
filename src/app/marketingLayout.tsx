@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import logo from "@/assets/mycleanone_logo.png";
 import apiClient from "@/lib/axios";
 
@@ -10,6 +11,27 @@ const navLinks = [
   { href: "/marketing", label: "Home" },
   { href: "/pricing", label: "Pricing" },
   { href: "/docs", label: "Docs" },
+  {
+    href: "/privacypolicy",
+    label: "Privacy Policy",
+    hasDropdown: true,
+    dropdownItems: [
+      {
+        href: "/privacypolicy/generalprivacypolicy",
+        label: "General Privacy Policy",
+      },
+      { href: "/privacypolicy/productspolicy", label: "Products Policy" },
+      {
+        href: "/privacypolicy/cancellationpolicy",
+        label: "Cancellation and Refund Policy",
+      },
+      { href: "/privacypolicy/companyguidelines", label: "Company Guidelines" },
+      {
+        href: "/privacypolicy/mypersonalinfo",
+        label: "My Personal Information",
+      },
+    ],
+  },
 ];
 
 export default function MarketingLayout({
@@ -18,6 +40,7 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -70,12 +93,22 @@ export default function MarketingLayout({
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="relative"
+              onMouseEnter={() => link.hasDropdown && setDropdownOpen(true)}
+              onMouseLeave={() => link.hasDropdown && setDropdownOpen(false)}
             >
               <Link
                 href={link.href}
-                className="px-4 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition-all duration-300 font-medium text-base relative group hover:shadow-lg hover:shadow-blue-100 dark:hover:shadow-blue-900/20"
+                className="px-4 py-2.5 rounded-xl text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition-all duration-300 font-medium text-base relative hover:shadow-lg hover:shadow-blue-100 dark:hover:shadow-blue-900/20 flex items-center space-x-1"
               >
-                {link.label}
+                <span>{link.label}</span>
+                {link.hasDropdown && (
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-300 ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                )}
                 <motion.div
                   className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
                   initial={{ width: 0 }}
@@ -83,6 +116,47 @@ export default function MarketingLayout({
                   transition={{ duration: 0.3 }}
                 />
               </Link>
+
+              {/* Dropdown for Privacy Policy */}
+              {link.hasDropdown && (
+                <AnimatePresence>
+                  {dropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute top-full left-0 mt-2 z-50"
+                      onMouseEnter={() => setDropdownOpen(true)}
+                      onMouseLeave={() => setDropdownOpen(false)}
+                    >
+                      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-white/20 dark:border-slate-700/50 p-2 min-w-[280px] backdrop-blur-xl">
+                        {link.dropdownItems?.map((item, itemIndex) => (
+                          <motion.div
+                            key={item.href}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: 0.3,
+                              delay: itemIndex * 0.05,
+                            }}
+                          >
+                            <Link
+                              href={item.href}
+                              className="flex items-center px-4 py-3 rounded-xl text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition-all duration-200 text-sm font-medium"
+                              onClick={() => setDropdownOpen(false)}
+                            >
+                              {item.label}
+                            </Link>
+                          </motion.div>
+                        ))}
+                      </div>
+                      {/* Dropdown Arrow */}
+                      <div className="absolute -top-2 left-6 w-4 h-4 bg-white dark:bg-slate-800 border-l border-t border-white/20 dark:border-slate-700/50 rotate-45"></div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
             </motion.div>
           ))}
 
@@ -196,6 +270,30 @@ export default function MarketingLayout({
                     >
                       {link.label}
                     </Link>
+                    {/* Mobile Dropdown Items */}
+                    {link.hasDropdown && link.dropdownItems && (
+                      <div className="ml-4 mt-2 space-y-1">
+                        {link.dropdownItems.map((item, itemIndex) => (
+                          <motion.div
+                            key={item.href}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{
+                              duration: 0.3,
+                              delay: index * 0.1 + itemIndex * 0.05,
+                            }}
+                          >
+                            <Link
+                              href={item.href}
+                              className="block w-full px-4 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition-all duration-200 text-sm"
+                              onClick={() => setOpen(false)}
+                            >
+                              • {item.label}
+                            </Link>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                 ))}
 
