@@ -89,16 +89,25 @@ export default function DownloadsPage() {
 
   return (
     <div className="w-full max-w-3xl mx-auto py-8 px-2 sm:px-0">
-      <h1 className="text-2xl font-bold mb-4">Download Software</h1>
-      <p className="text-[var(--foreground)]/70 mb-8">
-        Get the latest version of ProApp for your operating system.
+      <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent">
+        Download Software
+      </h1>
+      <p className="text-xl text-slate-600 dark:text-slate-300 mb-10 leading-relaxed">
+        Get the latest version of ProApp for your operating system with enhanced
+        security features and improved performance.
       </p>
       {loading ? (
-        <div className="text-center text-[var(--foreground)]/70 py-8">
-          Checking license...
+        <div className="text-center text-slate-600 dark:text-slate-300 py-12">
+          <div className="text-lg font-medium">Checking license status...</div>
+          <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+            Please wait a moment
+          </div>
         </div>
       ) : error ? (
-        <div className="text-center text-[var(--error)] py-8">{error}</div>
+        <div className="text-center text-red-600 dark:text-red-400 py-12">
+          <div className="text-lg font-semibold">Error Occurred</div>
+          <div className="text-base mt-2">{error}</div>
+        </div>
       ) : hasLicense ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {downloads.map((d) => (
@@ -108,26 +117,28 @@ export default function DownloadsPage() {
                 os === d.os ? "border-[var(--accent)]" : "border-transparent"
               }`}
             >
-              <div className="text-lg font-semibold mb-2">{d.os}</div>
-              <div className="text-sm text-[var(--foreground)]/70 mb-2">
-                Version: {d.version}
+              <div className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">
+                {d.os}
               </div>
-              <div className="text-xs text-[var(--foreground)]/50 mb-4">
-                Released: {d.date}
+              <div className="text-base text-slate-600 dark:text-slate-300 mb-2 font-medium">
+                Version {d.version}
+              </div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                Released {d.date}
               </div>
               <a href={d.url} download>
                 <Button
                   variant={os === d.os ? "accent" : "secondary"}
                   size="md"
                 >
-                  {os === d.os ? "Recommended" : "Download"}
+                  {os === d.os ? "Download Now" : "Download"}
                 </Button>
               </a>
             </div>
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-16 gap-4">
+        <div className="flex flex-col items-center justify-center py-16 gap-6">
           <svg
             width="48"
             height="48"
@@ -139,14 +150,18 @@ export default function DownloadsPage() {
             <rect x="8" y="16" width="32" height="20" rx="4" />
             <path d="M16 16V12a8 8 0 0 1 16 0v4" />
           </svg>
-          <div className="text-lg font-semibold text-[var(--foreground)]/80">
-            No active license found
+          <div className="text-2xl font-bold text-slate-900 dark:text-white">
+            License Required
           </div>
-          <div className="text-[var(--foreground)]/60 text-sm mb-2">
-            You need an active license to download the software.
+          <div className="text-lg text-slate-600 dark:text-slate-300 text-center max-w-md">
+            You need an active license to download the software. Choose a plan
+            that fits your needs and get started today.
           </div>
           {!hasLicense && (
-            <div className="flex flex-col items-center gap-4 mb-4">
+            <div className="flex flex-col items-center gap-6 mb-6">
+              <div className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
+                Select Your Plan
+              </div>
               <div className="flex gap-4">
                 {plans.map(
                   (p: {
@@ -156,10 +171,10 @@ export default function DownloadsPage() {
                   }) => (
                     <label
                       key={p.value}
-                      className={`px-4 py-2 rounded-lg border cursor-pointer ${
+                      className={`px-6 py-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                         plan === p.value
-                          ? "bg-[var(--accent)] text-white"
-                          : "bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)]"
+                          ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg"
+                          : "bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)] hover:border-[var(--accent)]"
                       }`}
                     >
                       <input
@@ -170,18 +185,18 @@ export default function DownloadsPage() {
                         onChange={() => setPlan(p.value)}
                         className="mr-2 hidden"
                       />
-                      <span className="font-semibold">{p.label}</span>
-                      <span className="block text-xs text-[var(--foreground)]/70">
-                        {p.description}
-                      </span>
+                      <div className="font-bold text-lg mb-1">{p.label}</div>
+                      <div className="text-sm opacity-80">{p.description}</div>
                     </label>
                   )
                 )}
               </div>
             </div>
           )}
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm">Number of devices:</span>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-lg font-medium text-slate-700 dark:text-slate-300">
+              Number of devices:
+            </span>
             <input
               type="number"
               min={1}
@@ -201,29 +216,37 @@ export default function DownloadsPage() {
                 );
                 setQuantity(numericValue);
               }}
-              className="w-16 px-2 py-1 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)]"
+              className="w-20 px-3 py-2 rounded-lg border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] text-center font-semibold text-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent"
             />
+            <span className="text-lg text-slate-600 dark:text-slate-400 font-medium">
+              device{quantity > 1 ? "s" : ""}
+            </span>
           </div>
           <Button
             variant="accent"
-            size="md"
+            size="lg"
             onClick={handleBuy}
             disabled={checkoutLoading}
+            className="text-lg font-semibold px-8 py-3"
           >
             {checkoutLoading
-              ? "Redirecting..."
-              : `Buy Now (${quantity} Device${quantity > 1 ? "s" : ""})`}
+              ? "Redirecting to checkout..."
+              : `Purchase License (${quantity} Device${
+                  quantity > 1 ? "s" : ""
+                })`}
           </Button>
         </div>
       )}
-      <div className="mt-8 text-sm text-[var(--foreground)]/60 text-center">
-        <span>
-          Need help? See the{" "}
-          <a href="/docs" className="text-[var(--link)] hover:underline">
-            installation guide
-          </a>
-          .
-        </span>
+      <div className="mt-12 text-center">
+        <div className="text-lg text-slate-600 dark:text-slate-300 mb-2">
+          Need help with installation?
+        </div>
+        <a
+          href="/docs"
+          className="text-[var(--link)] hover:underline text-lg font-medium"
+        >
+          View our comprehensive installation guide
+        </a>
       </div>
     </div>
   );

@@ -2,68 +2,60 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function TermsAndConditionsPage() {
-  const sections = [
-    {
-      id: "license",
-      title: "License",
-      icon: "📜",
-      color: "from-blue-500 to-cyan-500",
-      content:
-        "Paciwire Technology Pvt Ltd grants you a non-exclusive, non-transferable, limited license to use our software products for personal or commercial use. This license is subject to your compliance with these terms and conditions.",
-    },
-    {
-      id: "intellectual-property",
-      title: "Intellectual Property",
-      icon: "🧠",
-      color: "from-purple-500 to-pink-500",
-      content:
-        "All intellectual property rights in our software and website, including but not limited to copyrights, trademarks, and trade secrets, belong to Paciwire Technology Pvt Ltd. You may not reproduce, distribute, modify, or create derivative works based on our software or website without our prior written consent.",
-    },
-    {
-      id: "disclaimer",
-      title: "Disclaimer of Warranties",
-      icon: "⚠️",
-      color: "from-orange-500 to-red-500",
-      content:
-        'Our software and website are provided "as is" and without warranties of any kind, express or implied. We do not warrant that our software or website will meet your requirements, be error-free, or be free from viruses or other harmful components.',
-      important:
-        'Our software and website are provided "as is" without any warranties.',
-    },
-    {
-      id: "liability",
-      title: "Limitation of Liability",
-      icon: "🛡️",
-      color: "from-red-500 to-pink-500",
-      content:
-        "Paciwire Technology Pvt Ltd shall not be liable for any damages, including but not limited to direct, indirect, incidental, special, or consequential damages, arising out of or in connection with the use of our software or website.",
-    },
-    {
-      id: "termination",
-      title: "Termination",
-      icon: "🚪",
-      color: "from-green-500 to-emerald-500",
-      content:
-        "We may terminate your license to use our software or website at any time, with or without cause. Upon termination, you must immediately cease all use of our software and website.",
-    },
-    {
-      id: "governing-law",
-      title: "Governing Law",
-      icon: "⚖️",
-      color: "from-indigo-500 to-purple-500",
-      content:
-        "These terms and conditions shall be governed by and construed in accordance with the laws of India. Any dispute arising out of or in connection with these terms and conditions shall be resolved through arbitration in accordance with the rules of the Indian Arbitration and Conciliation Act.",
-    },
-    {
-      id: "changes",
-      title: "Changes to these Terms",
-      icon: "🔄",
-      color: "from-teal-500 to-blue-500",
-      content:
-        "We reserve the right to modify these terms and conditions at any time, without notice. Your continued use of our software and website after such modifications shall constitute your acceptance of the modified terms and conditions.",
-    },
-  ];
+const sections = [
+  {
+    id: "collect",
+    title: "Information We Collect",
+    icon: "📊",
+    color: "from-blue-500 to-cyan-500",
+    content:
+      "We collect personal information when you visit our website, register an account, place an order, subscribe to our newsletter, or otherwise interact with us. This information may include your name, email address, mailing address, phone number, payment information, and other information necessary to process your order or provide our services.",
+  },
+  {
+    id: "use",
+    title: "How We Use Your Information",
+    icon: "⚙️",
+    color: "from-purple-500 to-pink-500",
+    content:
+      "We use your personal information to provide our services to you, including processing your orders, sending you updates and notifications, and responding to your inquiries. We may also use your information to improve our website, personalize your experience, and send you marketing communications.",
+  },
+  {
+    id: "share",
+    title: "Sharing Your Information",
+    icon: "🤝",
+    color: "from-green-500 to-emerald-500",
+    content:
+      "We may share your personal information with our third-party service providers who assist us in providing our services to you. We may also share your information with our affiliates and partners for marketing purposes. We will never sell or rent your personal information to third parties without your consent, except as required by law.",
+    important:
+      "We will never sell or rent your personal information to third parties without your consent, except as required by law.",
+  },
+  {
+    id: "cookies",
+    title: "Cookies",
+    icon: "🍪",
+    color: "from-orange-500 to-red-500",
+    content:
+      "We use cookies and other tracking technologies to improve your experience on our website, analyze usage, and personalize content and advertising. You can disable cookies in your browser settings, but please note that this may affect your experience on our website.",
+  },
+  {
+    id: "security",
+    title: "Security",
+    icon: "🔒",
+    color: "from-red-500 to-pink-500",
+    content:
+      "We take reasonable measures to protect your personal information from unauthorized access, use, disclosure, alteration, or destruction. We use industry-standard encryption technology to protect sensitive information, such as credit card numbers.",
+  },
+  {
+    id: "changes",
+    title: "Changes to this Policy",
+    icon: "🔄",
+    color: "from-indigo-500 to-purple-500",
+    content:
+      "We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the updated policy on our website.",
+  },
+];
 
+const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="max-w-6xl mx-auto px-6 py-16">
@@ -78,15 +70,15 @@ export default function TermsAndConditionsPage() {
             <span className="text-3xl">📋</span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent">
-            Terms & Conditions
+            Privacy Policy
           </h1>
           <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-            Rules and regulations for using Paciwire Technology Pvt Ltd's
-            website and software products
+            How Paciwire Technology Pvt Ltd protects and manages your personal
+            information
           </p>
         </motion.div>
 
-        {/* Introduction Card */}
+        {/* Intro Card */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -96,24 +88,24 @@ export default function TermsAndConditionsPage() {
           <div className="flex items-start space-x-4">
             <div className="flex-shrink-0">
               <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">👋</span>
+                <span className="text-2xl">🏢</span>
               </div>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-                Welcome to Paciwire Technology Pvt Ltd!
+                About This Policy
               </h2>
               <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
-                These terms and conditions outline the rules and regulations for
-                the use of our website and software products. By accessing our
-                website or using our software, you accept these terms and
-                conditions in full.
+                This Privacy Policy outlines how{" "}
+                <strong>Paciwire Technology Pvt Ltd</strong> collects, uses,
+                stores, and discloses personal information that is provided to
+                us through our website and other services.
               </p>
             </div>
           </div>
         </motion.div>
 
-        {/* Main Content Grid */}
+        {/* Main Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {sections.map((section, index) => (
             <motion.div
@@ -137,11 +129,9 @@ export default function TermsAndConditionsPage() {
                   </h3>
                 </div>
               </div>
-
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
                 {section.content}
               </p>
-
               {section.important && (
                 <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800/50 rounded-2xl p-4">
                   <div className="flex items-start space-x-3">
@@ -158,7 +148,7 @@ export default function TermsAndConditionsPage() {
           ))}
         </div>
 
-        {/* Contact Section */}
+        {/* Contact */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -171,8 +161,8 @@ export default function TermsAndConditionsPage() {
             </div>
             <h2 className="text-3xl font-bold mb-4">Have Questions?</h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              If you have any questions or concerns about our terms and
-              conditions, we're here to help.
+              If you have any questions or concerns about our Privacy Policy,
+              we're here to help.
             </p>
             <motion.a
               href="mailto:support@mycleanone.com"
@@ -200,4 +190,6 @@ export default function TermsAndConditionsPage() {
       </div>
     </div>
   );
-}
+};
+
+export default PrivacyPolicy;

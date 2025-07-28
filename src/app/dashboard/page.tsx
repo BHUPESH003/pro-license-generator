@@ -2,69 +2,254 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { Icon } from "@/components/ui/Icon";
+import {
+  User,
+  Smartphone,
+  Download,
+  TrendingUp,
+  Shield,
+  Zap,
+  ArrowRight,
+  CheckCircle,
+} from "lucide-react";
 
 const mockStats = {
   licenses: 2,
   devices: 3,
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+    },
+  },
+};
+
 export default function DashboardHome() {
   return (
-    <div className="w-full max-w-4xl mx-auto py-8 px-2 sm:px-0">
-      <h1 className="text-3xl font-bold mb-2">Welcome to your Dashboard</h1>
-      <p className="text-[var(--foreground)]/70 mb-8">
-        Manage your licenses, devices, and downloads all in one place.
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-        <div className="bg-[var(--card)] rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
-          <Icon name="user" size={32} className="mb-2 text-[var(--primary)]" />
-          <div className="text-2xl font-bold mb-1">{mockStats.licenses}</div>
-          <div className="text-[var(--foreground)]/70 mb-2">
-            Active Licenses
-          </div>
-          <Link href="/dashboard/licenses">
-            <Button size="sm" variant="accent">
-              View Licenses
-            </Button>
-          </Link>
+    <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6">
+      {/* Header Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-12"
+      >
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
+          <Shield className="w-8 h-8 text-white" />
         </div>
-        <div className="bg-[var(--card)] rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
-          <Icon name="lock" size={32} className="mb-2 text-[var(--accent)]" />
-          <div className="text-2xl font-bold mb-1">{mockStats.devices}</div>
-          <div className="text-[var(--foreground)]/70 mb-2">
-            Registered Devices
-          </div>
-          <Link href="/dashboard/devices">
-            <Button size="sm" variant="accent">
-              Manage Devices
-            </Button>
-          </Link>
-        </div>
-      </div>
-      <div className="bg-[var(--card)] rounded-2xl shadow-lg p-6 flex flex-col items-center text-center mb-8">
-        <svg
-          width="32"
-          height="32"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          className="mb-2 text-[var(--primary)]"
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent">
+          Welcome to your Dashboard
+        </h1>
+        <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+          Manage your licenses, devices, and downloads all in one place.
+          Everything you need to keep your software secure and up-to-date.
+        </p>
+      </motion.div>
+
+      {/* Stats Cards */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+      >
+        {/* Licenses Card */}
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ scale: 1.02, y: -5 }}
+          className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/50 p-8"
         >
-          <rect x="6" y="14" width="20" height="12" rx="2" />
-          <path d="M12 14V10a4 4 0 0 1 8 0v4" />
-        </svg>
-        <div className="text-xl font-bold mb-1">Download Software</div>
-        <div className="text-[var(--foreground)]/70 mb-2">
-          Get the latest version for your device.
+          <div className="flex items-center justify-between mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <User className="w-8 h-8 text-white" />
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                {mockStats.licenses}
+              </div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">
+                Active
+              </div>
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+            Active Licenses
+          </h3>
+          <p className="text-slate-600 dark:text-slate-300 mb-6">
+            Manage your software licenses and subscription details.
+          </p>
+          <Link href="/dashboard/licenses">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="lg"
+                variant="accent"
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <span>View Licenses</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </motion.div>
+          </Link>
+        </motion.div>
+
+        {/* Devices Card */}
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ scale: 1.02, y: -5 }}
+          className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/50 p-8"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <Smartphone className="w-8 h-8 text-white" />
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                {mockStats.devices}
+              </div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">
+                Registered
+              </div>
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+            Registered Devices
+          </h3>
+          <p className="text-slate-600 dark:text-slate-300 mb-6">
+            Monitor and manage all your connected devices securely.
+          </p>
+          <Link href="/dashboard/devices">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="lg"
+                variant="accent"
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <span>Manage Devices</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </motion.div>
+          </Link>
+        </motion.div>
+      </motion.div>
+
+      {/* Downloads Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        whileHover={{ scale: 1.01 }}
+        className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/50 p-8 mb-12"
+      >
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <Download className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                Download Software
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300 mb-4">
+                Get the latest version for your device with enhanced security
+                features.
+              </p>
+              <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-1">
+                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  <span>Latest Version</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Zap className="w-4 h-4 text-yellow-500" />
+                  <span>Enhanced Security</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Link href="/dashboard/downloads">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 px-8"
+              >
+                <span>Go to Downloads</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </motion.div>
+          </Link>
         </div>
-        <Link href="/dashboard/downloads">
-          <Button size="sm" variant="secondary">
-            Go to Downloads
-          </Button>
-        </Link>
-      </div>
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+      >
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <h4 className="font-semibold text-slate-900 dark:text-white">
+              Performance
+            </h4>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
+            Monitor your software performance and system health.
+          </p>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <h4 className="font-semibold text-slate-900 dark:text-white">
+              Security
+            </h4>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
+            Keep your devices protected with the latest security updates.
+          </p>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl p-6 border border-emerald-200 dark:border-emerald-800"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <Zap className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            <h4 className="font-semibold text-slate-900 dark:text-white">
+              Updates
+            </h4>
+          </div>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
+            Stay up-to-date with the latest features and improvements.
+          </p>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
