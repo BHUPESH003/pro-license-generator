@@ -320,7 +320,7 @@ export default function PricingPage() {
                 <Link href="/register">
                   <Button
                     size="lg"
-                    className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 text-lg"
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Start Free Trial
                   </Button>
