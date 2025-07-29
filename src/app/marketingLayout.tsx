@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import logo from "@/assets/mycleanone_logo.png";
 import apiClient from "@/lib/axios";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const navLinks = [
   { href: "/marketing", label: "Home" },
@@ -580,12 +581,12 @@ export default function MarketingLayout({
                 >
                   Terms of Service
                 </Link>
-                <Link
+                {/* <Link
                   href="/legal/eula"
                   className="text-slate-400 hover:text-white transition-colors duration-300 text-sm"
                 >
                   EULA
-                </Link>
+                </Link> */}
               </div>
             </div>
           </motion.div>
