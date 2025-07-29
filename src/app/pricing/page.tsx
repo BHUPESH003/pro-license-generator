@@ -157,7 +157,7 @@ export default function PricingPage() {
               key={plan.id}
               variants={cardVariants}
               whileHover={{ scale: 1.02, y: -5 }}
-              className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border transition-all duration-300 ${
+              className={`relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border transition-all duration-300 flex flex-col h-full ${
                 plan.popular
                   ? "border-purple-300 ring-2 ring-purple-500/20 shadow-purple-500/20"
                   : "border-white/20 dark:border-slate-700/50 hover:border-blue-300/60"
@@ -208,7 +208,7 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-4 mb-8 flex-grow">
                 {plan.features.map((feature, featureIndex) => (
                   <motion.div
                     key={featureIndex}
@@ -242,6 +242,7 @@ export default function PricingPage() {
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                className="mt-auto"
               >
                 <Link href="/dashboard/downloads" className="block">
                   <Button
@@ -320,7 +321,7 @@ export default function PricingPage() {
                 <Link href="/register">
                   <Button
                     size="lg"
-                    className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-4 text-lg"
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Start Free Trial
                   </Button>

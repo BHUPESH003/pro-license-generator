@@ -54,7 +54,7 @@ export default function RegisterPage() {
   const allAgreementsAccepted = acceptedTos && acceptedPrivacy && acceptedEula;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center px-6 py-16">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center px-2 md:px-6 py-16">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                 </>
               ) : (
                 <>
-                  <Mail className="w-5 h-5" />
+                  <Mail className="w-8 h-5" />
                   <span>Register & Get Setup Email</span>
                   <ArrowRight className="w-5 h-5" />
                 </>

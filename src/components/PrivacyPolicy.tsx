@@ -1,193 +1,543 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
-
-const sections = [
-  {
-    id: "collect",
-    title: "Information We Collect",
-    icon: "📊",
-    color: "from-blue-500 to-cyan-500",
-    content:
-      "We collect personal information when you visit our website, register an account, place an order, subscribe to our newsletter, or otherwise interact with us. This information may include your name, email address, mailing address, phone number, payment information, and other information necessary to process your order or provide our services.",
-  },
-  {
-    id: "use",
-    title: "How We Use Your Information",
-    icon: "⚙️",
-    color: "from-purple-500 to-pink-500",
-    content:
-      "We use your personal information to provide our services to you, including processing your orders, sending you updates and notifications, and responding to your inquiries. We may also use your information to improve our website, personalize your experience, and send you marketing communications.",
-  },
-  {
-    id: "share",
-    title: "Sharing Your Information",
-    icon: "🤝",
-    color: "from-green-500 to-emerald-500",
-    content:
-      "We may share your personal information with our third-party service providers who assist us in providing our services to you. We may also share your information with our affiliates and partners for marketing purposes. We will never sell or rent your personal information to third parties without your consent, except as required by law.",
-    important:
-      "We will never sell or rent your personal information to third parties without your consent, except as required by law.",
-  },
-  {
-    id: "cookies",
-    title: "Cookies",
-    icon: "🍪",
-    color: "from-orange-500 to-red-500",
-    content:
-      "We use cookies and other tracking technologies to improve your experience on our website, analyze usage, and personalize content and advertising. You can disable cookies in your browser settings, but please note that this may affect your experience on our website.",
-  },
-  {
-    id: "security",
-    title: "Security",
-    icon: "🔒",
-    color: "from-red-500 to-pink-500",
-    content:
-      "We take reasonable measures to protect your personal information from unauthorized access, use, disclosure, alteration, or destruction. We use industry-standard encryption technology to protect sensitive information, such as credit card numbers.",
-  },
-  {
-    id: "changes",
-    title: "Changes to this Policy",
-    icon: "🔄",
-    color: "from-indigo-500 to-purple-500",
-    content:
-      "We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the updated policy on our website.",
-  },
-];
+import {
+  Shield,
+  Database,
+  Settings,
+  Share2,
+  Cookie,
+  Lock,
+  RefreshCw,
+  Mail,
+  FileText,
+  Eye,
+  Users,
+  Globe,
+  AlertTriangle,
+  CheckCircle,
+  Building,
+  Calendar,
+  Phone,
+  Info,
+} from "lucide-react";
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-lg">
-            <span className="text-3xl">📋</span>
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent">
-            Privacy Policy
-          </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-            How Paciwire Technology Pvt Ltd protects and manages your personal
-            information
-          </p>
-        </motion.div>
-
-        {/* Intro Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl p-8 md:p-12 mb-12 shadow-xl border border-white/20 dark:border-slate-700/50"
-        >
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0">
-              <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🏢</span>
-              </div>
-            </div>
+      {/* Header */}
+      <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-sm border-b border-slate-200/50 dark:border-slate-700/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center">
+            <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400 mr-3" />
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-                About This Policy
-              </h2>
-              <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
-                This Privacy Policy outlines how{" "}
-                <strong>Paciwire Technology Pvt Ltd</strong> collects, uses,
-                stores, and discloses personal information that is provided to
-                us through our website and other services.
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+                Privacy Policy
+              </h1>
+              <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+                Paciwire Technology Pvt Ltd - Last updated June 30, 2024
               </p>
             </div>
           </div>
-        </motion.div>
-
-        {/* Main Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {sections.map((section, index) => (
-            <motion.div
-              key={section.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-              className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/20 dark:border-slate-700/50 hover:shadow-2xl transition-all duration-300 group"
-            >
-              <div className="flex items-start space-x-4 mb-6">
-                <div className="flex-shrink-0">
-                  <div
-                    className={`w-12 h-12 bg-gradient-to-r ${section.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    <span className="text-2xl">{section.icon}</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-                    {section.title}
-                  </h3>
-                </div>
-              </div>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-                {section.content}
-              </p>
-              {section.important && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800/50 rounded-2xl p-4">
-                  <div className="flex items-start space-x-3">
-                    <span className="text-yellow-600 dark:text-yellow-400 text-lg">
-                      ⚠️
-                    </span>
-                    <p className="text-yellow-800 dark:text-yellow-200 font-medium">
-                      {section.important}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          ))}
         </div>
+      </header>
 
-        {/* Contact */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.0 }}
-          className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl p-8 md:p-12 text-white shadow-2xl"
-        >
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6">
-              <span className="text-3xl">📧</span>
-            </div>
-            <h2 className="text-3xl font-bold mb-4">Have Questions?</h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              If you have any questions or concerns about our Privacy Policy,
-              we're here to help.
-            </p>
-            <motion.a
-              href="mailto:support@mycleanone.com"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center space-x-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-8 py-4 rounded-2xl font-semibold transition-all duration-300 border border-white/30"
-            >
-              <span className="text-xl">✉️</span>
-              <span>support@mycleanone.com</span>
-            </motion.a>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Introduction */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <Building className="h-6 w-6 text-blue-500 dark:text-blue-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              About This Policy
+            </h2>
           </div>
-        </motion.div>
 
-        {/* Footer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1.2 }}
-          className="text-center mt-12 pt-8 border-t border-slate-200 dark:border-slate-700"
-        >
-          <p className="text-slate-500 dark:text-slate-400">
-            <strong>Last updated:</strong> June 30, 2024
-          </p>
-        </motion.div>
-      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                Our Commitment to Privacy
+              </h3>
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                <p className="text-blue-800 dark:text-blue-200 leading-relaxed">
+                  This Privacy Policy outlines how{" "}
+                  <strong>Paciwire Technology Pvt Ltd</strong>
+                  collects, uses, stores, and discloses personal information
+                  that is provided to us through our website and other services.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                Your Protection
+              </h3>
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                <p className="text-green-800 dark:text-green-200 leading-relaxed">
+                  We are committed to protecting your personal information and
+                  maintaining transparency about how we handle your data across
+                  all our services and platforms.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Table of Contents */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <FileText className="h-6 w-6 text-purple-500 dark:text-purple-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Policy Overview
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <Database className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
+                <span className="font-medium text-gray-900 dark:text-white">
+                  Information We Collect
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <Settings className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
+                <span className="font-medium text-gray-900 dark:text-white">
+                  How We Use Information
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <Share2 className="h-5 w-5 text-red-500 dark:text-red-400 mr-2" />
+                <span className="font-medium text-gray-900 dark:text-white">
+                  Sharing Information
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <Cookie className="h-5 w-5 text-orange-500 dark:text-orange-400 mr-2" />
+                <span className="font-medium text-gray-900 dark:text-white">
+                  Cookies & Tracking
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <Lock className="h-5 w-5 text-purple-500 dark:text-purple-400 mr-2" />
+                <span className="font-medium text-gray-900 dark:text-white">
+                  Security Measures
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <RefreshCw className="h-5 w-5 text-indigo-500 dark:text-indigo-400 mr-2" />
+                <span className="font-medium text-gray-900 dark:text-white">
+                  Policy Changes
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Information We Collect */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <Database className="h-6 w-6 text-blue-500 dark:text-blue-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Information We Collect
+            </h2>
+          </div>
+
+          <div className="mb-6">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
+              <p className="text-blue-800 dark:text-blue-200 leading-relaxed">
+                We collect personal information when you visit our website,
+                register an account, place an order, subscribe to our
+                newsletter, or otherwise interact with us.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Users className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Personal Information
+                </h3>
+              </div>
+              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                <li>• Name and contact details</li>
+                <li>• Email address</li>
+                <li>• Mailing address</li>
+                <li>• Phone number</li>
+              </ul>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Lock className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Payment Information
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Payment information and other details necessary to process your
+                order or provide our services.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Globe className="h-5 w-5 text-purple-500 dark:text-purple-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Interaction Data
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Information collected through your interactions with our
+                website, services, and customer support.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* How We Use Your Information */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <Settings className="h-6 w-6 text-green-500 dark:text-green-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              How We Use Your Information
+            </h2>
+          </div>
+
+          <div className="mb-6">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4 mb-6">
+              <p className="text-green-800 dark:text-green-200 leading-relaxed">
+                We use your personal information to provide our services to you,
+                including processing your orders, sending you updates and
+                notifications, and responding to your inquiries.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <CheckCircle className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Service Provision
+                </h3>
+              </div>
+              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                <li>• Processing your orders</li>
+                <li>• Sending updates and notifications</li>
+                <li>• Responding to inquiries</li>
+                <li>• Customer support</li>
+              </ul>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Eye className="h-5 w-5 text-purple-500 dark:text-purple-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Improvement & Marketing
+                </h3>
+              </div>
+              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                <li>• Website improvement</li>
+                <li>• Personalizing your experience</li>
+                <li>• Sending marketing communications</li>
+                <li>• Service optimization</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Sharing Your Information */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <Share2 className="h-6 w-6 text-red-500 dark:text-red-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Sharing Your Information
+            </h2>
+          </div>
+
+          <div className="mb-6">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-6">
+              <p className="text-red-800 dark:text-red-200 leading-relaxed">
+                We may share your personal information with our third-party
+                service providers who assist us in providing our services to
+                you. We may also share your information with our affiliates and
+                partners for marketing purposes.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 mb-6">
+            <div className="flex items-start">
+              <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-2 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                  Important Promise
+                </h3>
+                <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+                  We will never sell or rent your personal information to third
+                  parties without your consent, except as required by law.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Users className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Service Providers
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Third-party service providers who assist us in delivering our
+                services, processing payments, and maintaining our platform.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Building className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Affiliates & Partners
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Our affiliates and partners for marketing purposes, always with
+                appropriate privacy protections in place.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Cookies */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <Cookie className="h-6 w-6 text-orange-500 dark:text-orange-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Cookies & Tracking Technologies
+            </h2>
+          </div>
+
+          <div className="mb-6">
+            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg p-4 mb-6">
+              <p className="text-orange-800 dark:text-orange-200 leading-relaxed">
+                We use cookies and other tracking technologies to improve your
+                experience on our website, analyze usage, and personalize
+                content and advertising.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Eye className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Website Experience
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Improve your browsing experience and website functionality.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Database className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Usage Analysis
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Analyze how you use our website to improve our services.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Settings className="h-5 w-5 text-purple-500 dark:text-purple-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Personalization
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Personalize content and advertising based on your preferences.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              <strong>Cookie Control:</strong> You can disable cookies in your
+              browser settings, but please note that this may affect your
+              experience on our website.
+            </p>
+          </div>
+        </section>
+
+        {/* Security */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <Lock className="h-6 w-6 text-purple-500 dark:text-purple-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Security Measures
+            </h2>
+          </div>
+
+          <div className="mb-6">
+            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4 mb-6">
+              <p className="text-purple-800 dark:text-purple-200 leading-relaxed">
+                We take reasonable measures to protect your personal information
+                from unauthorized access, use, disclosure, alteration, or
+                destruction.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Shield className="h-5 w-5 text-red-500 dark:text-red-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Encryption Technology
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                We use industry-standard encryption technology to protect
+                sensitive information, such as credit card numbers.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Lock className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Access Controls
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                Strict access controls and monitoring systems to prevent
+                unauthorized access to your personal information.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Changes to Policy */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 mb-8 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <RefreshCw className="h-6 w-6 text-indigo-500 dark:text-indigo-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Changes to This Policy
+            </h2>
+          </div>
+
+          <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg p-4 mb-4">
+            <p className="text-indigo-800 dark:text-indigo-200 leading-relaxed">
+              We may update this Privacy Policy from time to time. We will
+              notify you of any material changes by posting the updated policy
+              on our website.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Calendar className="h-5 w-5 text-blue-500 dark:text-blue-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Regular Updates
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                We regularly review and update our privacy practices to ensure
+                they remain current and effective.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center mb-3">
+                <Info className="h-5 w-5 text-green-500 dark:text-green-400 mr-2" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">
+                  Notification Process
+                </h3>
+              </div>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                You will be notified of significant changes through our website
+                and other appropriate communication channels.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Information */}
+        <section className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-lg shadow-sm p-6 border border-slate-200/50 dark:border-slate-700/50">
+          <div className="flex items-center mb-6">
+            <Mail className="h-6 w-6 text-blue-500 dark:text-blue-400 mr-3" />
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Questions & Support
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                Privacy Questions
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                If you have any questions or concerns about our Privacy Policy,
+                we're here to help and provide clarification.
+              </p>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Email:{" "}
+                <span className="text-blue-600 dark:text-blue-400">
+                  support@mycleanone.com
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                Data Protection Officer
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                For specific data protection inquiries and exercising your
+                privacy rights under applicable laws.
+              </p>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Contact:{" "}
+                <span className="text-blue-600 dark:text-blue-400">
+                  Available through support
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              <strong>Effective Date:</strong> This Privacy Policy is effective
+              as of June 30, 2024 and applies to all information collected by
+              Paciwire Technology Pvt Ltd.
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
   );
 };

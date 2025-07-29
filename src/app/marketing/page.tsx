@@ -86,9 +86,9 @@ export default function MarketingLandingPage() {
           >
             <Link href="/register">
               <Button
-                variant="accent"
+                // variant="accent"
                 size="lg"
-                className="text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-purple-700"
               >
                 Start Free Trial
               </Button>
@@ -100,9 +100,8 @@ export default function MarketingLandingPage() {
           >
             <Link href="/login">
               <Button
-                variant="secondary"
                 size="lg"
-                className="text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-purple-700"
               >
                 Login
               </Button>
@@ -426,9 +425,9 @@ export default function MarketingLandingPage() {
         >
           <Link href="/register">
             <Button
-              variant="accent"
+              // variant="accent"
               size="lg"
-              className="text-xl px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300"
+              className="text-xl px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300 bg-purple-700"
             >
               Get Started Today
             </Button>
