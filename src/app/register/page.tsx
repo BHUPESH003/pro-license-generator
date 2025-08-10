@@ -9,6 +9,8 @@ import {
   ArrowRight,
   Home,
 } from "lucide-react";
+import apiClient from "@/lib/axios";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -19,6 +21,7 @@ export default function RegisterPage() {
   const [acceptedTos, setAcceptedTos] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [acceptedEula, setAcceptedEula] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,17 +38,13 @@ export default function RegisterPage() {
     }
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await apiClient.post("/api/auth/register", { email, password });
       setSuccess(
         "Registration successful! Please check your email to set your password."
       );
-      setTimeout(() => {
-        // router.push("/login");
-        console.log("Redirecting to login...");
-      }, 2000);
-    } catch (err) {
-      setError("Registration failed");
+      setTimeout(() => router.push("/login"), 2000);
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Registration failed");
     } finally {
       setLoading(false);
     }
