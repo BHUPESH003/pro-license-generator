@@ -20,7 +20,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [acceptedTos, setAcceptedTos] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
-  const [acceptedEula, setAcceptedEula] = useState(false);
+
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,10 +29,8 @@ export default function RegisterPage() {
     setError("");
     setSuccess("");
 
-    if (!acceptedTos || !acceptedPrivacy || !acceptedEula) {
-      setError(
-        "You must accept the Terms of Service, Privacy Policy, and EULA to register."
-      );
+    if (!acceptedTos || !acceptedPrivacy) {
+      setError("You must accept the Terms of Service and Privacy Policy.");
       setLoading(false);
       return;
     }
@@ -50,7 +48,7 @@ export default function RegisterPage() {
     }
   };
 
-  const allAgreementsAccepted = acceptedTos && acceptedPrivacy && acceptedEula;
+  const allAgreementsAccepted = acceptedTos && acceptedPrivacy;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-center px-2 md:px-6 py-16">
@@ -127,13 +125,6 @@ export default function RegisterPage() {
                     setState: setAcceptedPrivacy,
                     text: "Privacy Policy",
                     href: "/legal/privacy",
-                  },
-                  {
-                    key: "eula",
-                    state: acceptedEula,
-                    setState: setAcceptedEula,
-                    text: "End User License Agreement (EULA)",
-                    href: "/legal/eula",
                   },
                 ].map((agreement, index) => (
                   <motion.label

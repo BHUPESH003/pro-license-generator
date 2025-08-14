@@ -36,8 +36,10 @@ function CreatePasswordForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-8 bg-[var(--surface)] text-[var(--foreground)] rounded-2xl shadow-lg">
-      <h1 className="text-2xl font-bold mb-6">Set Your Password</h1>
+    <div className="max-w-md mx-auto mt-20 p-8 bg-[var(--surface)] text-[var(--foreground)] rounded-2xl shadow-lg border border-[var(--border)]">
+      <h1 className="text-2xl font-bold mb-6 text-[var(--primary)]">
+        Set Your Password
+      </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
           type="password"
@@ -57,7 +59,12 @@ function CreatePasswordForm() {
         {success && (
           <div className="text-[var(--success)] text-sm">{success}</div>
         )}
-        <Button type="submit" variant="accent" disabled={loading}>
+        <Button
+          type="submit"
+          variant="accent"
+          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent"
+          disabled={loading}
+        >
           {loading ? "Setting..." : "Set Password"}
         </Button>
       </form>

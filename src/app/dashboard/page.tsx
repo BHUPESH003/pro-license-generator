@@ -69,7 +69,7 @@ export default function DashboardHome() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
       >
         {/* Licenses Card */}
         <motion.div
@@ -155,47 +155,44 @@ export default function DashboardHome() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        whileHover={{ scale: 1.01 }}
-        className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/50 p-8 mb-12"
+        whileHover={{ scale: 1.02, y: -5 }}
+        className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/50 p-6 sm:p-8 mb-12"
       >
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <Download className="w-10 h-10 text-white" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
+            <Download className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          </div>
+          <div className="text-right">
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+              Version
             </div>
-            <div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                Download Software
-              </h3>
-              <p className="text-slate-600 dark:text-slate-300 mb-4">
-                Get the latest version for your device with enhanced security
-                features.
-              </p>
-              <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  <span>Latest Version</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Zap className="w-4 h-4 text-yellow-500" />
-                  <span>Enhanced Security</span>
-                </div>
-              </div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
+              Latest
             </div>
           </div>
-          <Link href="/dashboard/downloads">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                size="lg"
-                variant="secondary"
-                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 px-8"
-              >
-                <span>Go to Downloads</span>
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </motion.div>
-          </Link>
         </div>
+
+        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          Download Software
+        </h3>
+
+        <p className="text-slate-600 dark:text-slate-300 mb-6">
+          Get the latest version for your device with enhanced security
+          features.
+        </p>
+
+        <Link href="/dashboard/downloads">
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <span>Go to Downloads</span>
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </motion.div>
+        </Link>
       </motion.div>
 
       {/* Quick Actions */}
@@ -203,7 +200,7 @@ export default function DashboardHome() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
       >
         <motion.div
           whileHover={{ scale: 1.05 }}

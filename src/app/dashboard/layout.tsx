@@ -16,7 +16,6 @@ import {
   Mail,
 } from "lucide-react";
 import logo from "@/assets/mycleanone_logo.png";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const sidebarLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -105,7 +104,7 @@ export default function DashboardLayout({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="hidden md:flex flex-col w-72 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4"
+            className="hidden md:flex flex-col w-80 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4"
           >
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
@@ -178,7 +177,7 @@ export default function DashboardLayout({
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="w-80 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4 flex flex-col h-full shadow-2xl"
+                className="w-full bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4 flex flex-col h-full shadow-2xl"
               >
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
