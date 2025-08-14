@@ -109,7 +109,7 @@ export default function DownloadsPage() {
           <div className="text-base mt-2">{error}</div>
         </div>
       ) : hasLicense ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {downloads.map((d) => (
             <div
               key={d.os}
@@ -130,6 +130,7 @@ export default function DownloadsPage() {
                 <Button
                   variant={os === d.os ? "accent" : "secondary"}
                   size="md"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent"
                 >
                   {os === d.os ? "Download Now" : "Download"}
                 </Button>
@@ -227,7 +228,7 @@ export default function DownloadsPage() {
             size="lg"
             onClick={handleBuy}
             disabled={checkoutLoading}
-            className="text-lg font-semibold px-8 py-3"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent text-lg font-semibold px-8 py-3"
           >
             {checkoutLoading
               ? "Redirecting to checkout..."

@@ -97,6 +97,7 @@ export default function DevicesPage() {
             variant="accent"
             size="md"
             onClick={() => (window.location.href = "/dashboard/licenses")}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent"
           >
             View Licenses
           </Button>

@@ -248,7 +248,7 @@ export default function LoginPage() {
               </div>
 
               <Link href="/register" className="block">
-                <Button className="w-full h-12 border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 font-semibold rounded-xl transition-all duration-300 bg-transparent">
+                <Button className="w-full h-12 border-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 bg-transparent">
                   Create New Account
                 </Button>
               </Link>
