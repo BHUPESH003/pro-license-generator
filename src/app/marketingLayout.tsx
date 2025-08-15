@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import logo from "@/assets/mycleanone_logo.png";
 import apiClient from "@/lib/axios";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const navLinks = [
   { href: "/marketing", label: "Home" },
@@ -209,7 +208,7 @@ export default function MarketingLayout({
               >
                 <Link
                   href="/register"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 font-medium text-base transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/25"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-lg transition-all duration-300 font-medium text-base transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/25"
                 >
                   Get Started
                 </Link>
@@ -531,7 +530,7 @@ export default function MarketingLayout({
                       <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                     </svg>
                   </div>
-                  <span className="text-base">+91 8950798051</span>
+                  <span className="text-base">+91 8885336085</span>
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.02, x: 5 }}

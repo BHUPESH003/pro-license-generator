@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import jwt from "jsonwebtoken";
+import { sendEmailToSQS } from "@/lib/sqsService";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +31,15 @@ export async function POST(req: NextRequest) {
     }
     user.password = password; // <-- Assign plain password, let model hash it
     await user.save();
+    // Send welcome email
+    await sendEmailToSQS({
+      email: user.email,
+      template: "renderWelcomeTemplate",
+      data: {
+        username: user.name || user.email.split("@")[0],
+        dashboardUrl: process.env.NEXT_PUBLIC_BASE_URL,
+      },
+    });
     return NextResponse.json({ message: "Password set successfully." });
   } catch (error) {
     return NextResponse.json(

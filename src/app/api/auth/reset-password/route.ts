@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Invalid token." }, { status: 400 });
     }
-    user.password = await bcrypt.hash(password, 10);
+    user.password = password; // <-- Assign plain password, let model hash it;
     await user.save();
     return NextResponse.json({ message: "Password reset successful." });
   } catch (error) {

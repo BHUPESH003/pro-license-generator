@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
@@ -12,12 +11,14 @@ import {
   Shield,
   Zap,
   ArrowRight,
-  CheckCircle,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import apiClient from "@/lib/axios";
 
-const mockStats = {
-  licenses: 2,
-  devices: 3,
+type DashboardStats = {
+  licenses: number;
+  devices: number;
+  latestVersion?: string;
 };
 
 const containerVariants = {
@@ -43,6 +44,26 @@ const itemVariants = {
 };
 
 export default function DashboardHome() {
+  const [stats, setStats] = useState<DashboardStats>({
+    licenses: 0,
+    devices: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await apiClient.get("/api/dashboard");
+
+        setStats(res.data.stats);
+      } catch (error) {
+        console.error("Dashboard fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
   return (
     <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6">
       {/* Header Section */}
@@ -83,7 +104,7 @@ export default function DashboardHome() {
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                {mockStats.licenses}
+                {loading ? "…" : stats.licenses}
               </div>
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Active
@@ -122,7 +143,7 @@ export default function DashboardHome() {
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-slate-900 dark:text-white">
-                {mockStats.devices}
+                {loading ? "…" : stats.devices}
               </div>
               <div className="text-sm text-slate-500 dark:text-slate-400">
                 Registered

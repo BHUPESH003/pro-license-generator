@@ -4,8 +4,6 @@ import User from "@/models/User";
 import jwt from "jsonwebtoken";
 import { sendEmailToSQS } from "@/lib/sqsService";
 
-const RESET_TOKEN_EXPIRY = 1000 * 60 * 60; // 1 hour
-
 export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();

@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     // Create Refresh Token (long-lived)
     const refreshToken = jwt.sign(
-      { userId: user._id }, // Keep payload minimal
+      { userId: user._id, email: user.email }, // Keep payload minimal
       process.env.JWT_REFRESH_SECRET!,
       { expiresIn: "7d" } // 7 days
     );
