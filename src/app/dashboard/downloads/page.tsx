@@ -39,9 +39,7 @@ export default function DownloadsPage() {
   const [hasLicense, setHasLicense] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [quantity, setQuantity] = useState<number>(1);
-  const [plan, setPlan] = useState("monthly");
+  // Purchase options are intentionally removed from downloads page
 
   useEffect(() => {
     setOS(detectOS());
@@ -62,30 +60,7 @@ export default function DownloadsPage() {
     fetchLicenses();
   }, []);
 
-  const handleBuy = async () => {
-    setCheckoutLoading(true);
-    try {
-      const res = await apiClient.post("/api/stripe/create-checkout-session", {
-        plan,
-        quantity,
-      });
-      window.location.href = res.data.url;
-    } catch {
-      alert("Failed to start checkout. Please try again.");
-    } finally {
-      setCheckoutLoading(false);
-    }
-  };
-
-  const plans = [
-    { value: "monthly", label: "Monthly", description: "Billed every month" },
-    {
-      value: "quarterly",
-      label: "Quarterly",
-      description: "Billed every 3 months",
-    },
-    { value: "yearly", label: "Yearly", description: "Billed every year" },
-  ];
+  // Note: No buy/plan selection on downloads page
 
   return (
     <div className="w-full max-w-3xl mx-auto py-8 px-2 sm:px-0">
@@ -155,87 +130,17 @@ export default function DownloadsPage() {
             License Required
           </div>
           <div className="text-lg text-slate-600 dark:text-slate-300 text-center max-w-md">
-            You need an active license to download the software. Choose a plan
-            that fits your needs and get started today.
+            You need an active license to download the software.
           </div>
-          {!hasLicense && (
-            <div className="flex flex-col items-center gap-6 mb-6">
-              <div className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
-                Select Your Plan
-              </div>
-              <div className="flex gap-4">
-                {plans.map(
-                  (p: {
-                    value: string;
-                    label: string;
-                    description: string;
-                  }) => (
-                    <label
-                      key={p.value}
-                      className={`px-6 py-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                        plan === p.value
-                          ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg"
-                          : "bg-[var(--surface)] border-[var(--border)] text-[var(--foreground)] hover:border-[var(--accent)]"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="plan"
-                        value={p.value}
-                        checked={plan === p.value}
-                        onChange={() => setPlan(p.value)}
-                        className="mr-2 hidden"
-                      />
-                      <div className="font-bold text-lg mb-1">{p.label}</div>
-                      <div className="text-sm opacity-80">{p.description}</div>
-                    </label>
-                  )
-                )}
-              </div>
-            </div>
-          )}
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-lg font-medium text-slate-700 dark:text-slate-300">
-              Number of devices:
-            </span>
-            <input
-              type="number"
-              min={1}
-              max={10}
-              value={quantity}
-              onChange={(e) => {
-                const value = e.target.value;
-                // Allow empty string or valid number input
-                if (value === "" || /^[0-9\b]+$/.test(value)) {
-                  setQuantity(Number(value));
-                }
-              }}
-              onBlur={() => {
-                const numericValue = Math.max(
-                  1,
-                  Math.min(10, Number(quantity))
-                );
-                setQuantity(numericValue);
-              }}
-              className="w-20 px-3 py-2 rounded-lg border-2 border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] text-center font-semibold text-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent"
-            />
-            <span className="text-lg text-slate-600 dark:text-slate-400 font-medium">
-              device{quantity > 1 ? "s" : ""}
-            </span>
-          </div>
-          <Button
-            variant="accent"
-            size="lg"
-            onClick={handleBuy}
-            disabled={checkoutLoading}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent text-lg font-semibold px-8 py-3"
-          >
-            {checkoutLoading
-              ? "Redirecting to checkout..."
-              : `Purchase License (${quantity} Device${
-                  quantity > 1 ? "s" : ""
-                })`}
-          </Button>
+          <a href="/dashboard/licenses">
+            <Button
+              variant="accent"
+              size="lg"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent text-lg font-semibold px-8 py-3"
+            >
+              Go to Licenses
+            </Button>
+          </a>
         </div>
       )}
       <div className="mt-12 text-center">

@@ -47,7 +47,7 @@ export default function DashboardLayout({
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-lg border-b border-white/20 dark:border-slate-700/50 z-10"
+          className="w-full flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-lg border-b border-white/20 dark:border-slate-700/50 z-20 sticky top-0"
         >
           <div className="flex items-center gap-3">
             <motion.button
@@ -104,7 +104,7 @@ export default function DashboardLayout({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="hidden md:flex flex-col w-80 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4"
+            className="hidden md:flex flex-col w-80 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-r border-white/20 dark:border-slate-700/50 py-8 px-6 gap-4 sticky top-0 h-[calc(100vh-4rem)]"
           >
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">

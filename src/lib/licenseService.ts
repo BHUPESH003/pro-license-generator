@@ -20,7 +20,7 @@ export interface CreateLicensesResult {
  */
 export async function createLicenses(
   userId: mongoose.Types.ObjectId,
-  subscriptionId: string,
+  subscriptionId: string | null,
   customerId: Stripe.Customer,
   plan: string,
   qty: number
@@ -41,7 +41,7 @@ export async function createLicenses(
     licensesToInsert.push({
       licenseKey,
       userId,
-      stripeSubscriptionId: subscriptionId,
+      stripeSubscriptionId: subscriptionId || undefined,
       stripeCustomerId: customerId,
       status: "active",
       plan,

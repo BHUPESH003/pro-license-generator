@@ -9,6 +9,9 @@ export default function LicensesPage() {
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [renewPlan, setRenewPlan] = useState<Record<string, string>>({});
+  const [purchasePlan, setPurchasePlan] = useState("monthly");
+  const [purchaseQuantity, setPurchaseQuantity] = useState<string>("1");
 
   useEffect(() => {
     const fetchLicenses = async () => {
@@ -32,46 +35,82 @@ export default function LicensesPage() {
     setTimeout(() => setCopied(null), 1500);
   };
 
-  const handleActivate = async (id: string) => {
-    const deviceId = prompt("Enter device name or ID to activate:");
-    if (!deviceId) return;
-    setActionLoading(id);
-    try {
-      await apiClient.post(`/api/licenses/${id}/activate`, { deviceId });
-      setLicenses((prev) =>
-        prev.map((l) =>
-          l._id === id ? { ...l, deviceId, status: "active" } : l
-        )
-      );
-    } catch (err: any) {
-      alert(err.response?.data?.error || "Activation failed");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleDeactivate = async (id: string) => {
-    if (!window.confirm("Are you sure you want to deactivate this license?"))
-      return;
-    setActionLoading(id);
-    try {
-      await apiClient.post(`/api/licenses/${id}/deactivate`);
-      setLicenses((prev) =>
-        prev.map((l) =>
-          l._id === id ? { ...l, deviceId: null, status: "inactive" } : l
-        )
-      );
-    } catch (err: any) {
-      alert(err.response?.data?.error || "Deactivation failed");
-    } finally {
-      setActionLoading(null);
-    }
+  const startCheckout = async (
+    plan: string,
+    mode: "subscription" | "payment",
+    licenseId?: string,
+    quantityOverride?: number
+  ) => {
+    const res = await apiClient.post("/api/stripe/create-checkout-session", {
+      plan,
+      quantity: quantityOverride || 1,
+      mode,
+      licenseId,
+    });
+    window.location.href = res.data.url;
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto py-8 px-2 sm:px-0">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">My Licenses</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent">
+          My Licenses
+        </h1>
+      </div>
+
+      {/* Purchase licenses */}
+      <div className="bg-[var(--card)] rounded-2xl shadow-lg p-6 mb-8 border border-[var(--border)]">
+        <div className="text-lg font-semibold mb-4">Purchase licenses</div>
+        <div className="flex items-center gap-3 flex-wrap mb-4">
+          <select
+            className="px-2 py-1 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)]"
+            value={purchasePlan}
+            onChange={(e) => setPurchasePlan(e.target.value)}
+          >
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+          <input
+            type="number"
+            className="w-24 px-2 py-1 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)]"
+            value={purchaseQuantity}
+            onChange={(e) => setPurchaseQuantity(e.target.value)}
+            placeholder="Qty"
+          />
+        </div>
+        <Button
+          size="md"
+          variant="accent"
+          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent"
+          disabled={!purchaseQuantity || Number(purchaseQuantity) < 1}
+          onClick={() =>
+            startCheckout(
+              purchasePlan,
+              "subscription",
+              undefined,
+              Math.max(1, parseInt(purchaseQuantity || "1", 10) || 1)
+            )
+          }
+        >
+          Subscribe
+        </Button>
+        <Button
+          size="md"
+          variant="secondary"
+          className="ml-2"
+          disabled={!purchaseQuantity || Number(purchaseQuantity) < 1}
+          onClick={() =>
+            startCheckout(
+              purchasePlan,
+              "payment",
+              undefined,
+              Math.max(1, parseInt(purchaseQuantity || "1", 10) || 1)
+            )
+          }
+        >
+          Pay now
+        </Button>
       </div>
       {loading ? (
         <div className="text-center text-[var(--foreground)]/70 py-8">
@@ -101,9 +140,10 @@ export default function LicensesPage() {
           <Button
             variant="accent"
             size="md"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent"
             onClick={() => (window.location.href = "/pricing")}
           >
-            View Pricing
+            View Plans
           </Button>
         </div>
       ) : (
@@ -145,7 +185,9 @@ export default function LicensesPage() {
                       {lic.status}
                     </span>
                   </span>
-                  <span>Expires: {lic.expiration || "-"}</span>
+                  <span>
+                    Expires: {lic.expiryDate ? new Date(lic.expiryDate).toLocaleDateString() : "-"}
+                  </span>
                   <span>
                     Purchased:{" "}
                     {lic.purchaseDate
@@ -154,30 +196,73 @@ export default function LicensesPage() {
                   </span>
                   {lic.deviceId && <span>Device: {lic.deviceId}</span>}
                 </div>
+                {lic.expiryDate && new Date(lic.expiryDate) < new Date() && (
+                  <div className="mt-2 inline-flex items-center gap-2 text-[var(--error)] bg-red-500/10 border border-red-200 dark:border-red-900/40 rounded-full px-3 py-1 text-xs font-semibold w-fit">
+                    <span className="h-2 w-2 rounded-full bg-[var(--error)]"></span>
+                    Expired
+                  </div>
+                )}
               </div>
-              <div className="flex flex-col gap-2 min-w-[120px]">
-                {lic.status === "inactive" ? (
+              {lic.status !== "active" && (
+                <div className="flex items-center gap-3">
+                  <select
+                    className="px-2 py-1 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)]"
+                    value={renewPlan[lic._id] || "monthly"}
+                    onChange={(e) =>
+                      setRenewPlan((prev) => ({ ...prev, [lic._id]: e.target.value }))
+                    }
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
                   <Button
                     size="sm"
                     variant="accent"
-                    onClick={() => handleActivate(lic._id)}
-                    disabled={actionLoading === lic._id}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent"
+                    onClick={() =>
+                      startCheckout(renewPlan[lic._id] || "monthly", "payment", lic._id)
+                    }
                   >
-                    {actionLoading === lic._id ? "Activating..." : "Activate"}
+                    Pay now
                   </Button>
-                ) : (
                   <Button
                     size="sm"
-                    variant="error"
-                    onClick={() => handleDeactivate(lic._id)}
-                    disabled={actionLoading === lic._id}
+                    variant="secondary"
+                    onClick={() =>
+                      startCheckout(renewPlan[lic._id] || "monthly", "subscription", lic._id)
+                    }
                   >
-                    {actionLoading === lic._id
-                      ? "Deactivating..."
-                      : "Deactivate"}
+                    Setup mandate
                   </Button>
-                )}
-              </div>
+                </div>
+              )}
+              {/* <div className="flex flex-col gap-2">
+                <div className="text-xs text-[var(--foreground)]/60">Manage billing</div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={async () => {
+                      try {
+                        // In a real app you'd fetch the customer id; for now rely on portal redirect header if set by middleware or via future API
+                        const res = await apiClient.post("/api/stripe/portal", undefined, {
+                          headers: {
+                            // placeholder; requires customer id header to be set
+                            "x-stripe-customer-id": lic.stripeCustomerId || "",
+                          },
+                        });
+                        if (res.data.url) window.location.href = res.data.url;
+                        else alert("Unable to open billing portal.");
+                      } catch (e) {
+                        alert("Unable to open billing portal.");
+                      }
+                    }}
+                  >
+                    Open billing portal
+                  </Button>
+                </div>
+              </div> */}
             </div>
           ))}
         </div>

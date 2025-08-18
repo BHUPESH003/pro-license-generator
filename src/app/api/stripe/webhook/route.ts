@@ -48,23 +48,97 @@ export async function POST(req: NextRequest) {
 
   let emailPayload: { email: string; data: any } | null = null;
 
-  // checkout.session.completed — create licenses
+  // checkout.session.completed — create licenses or renew one-time
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const email = session.customer_email;
     const subscriptionId = session.subscription;
     const customerId = session.customer;
-    const plan = session.metadata?.plan || "monthly";
-    const quantity = session.metadata?.quantity
-      ? parseInt(session.metadata.quantity)
+    const plan = (session.metadata as any)?.plan || "monthly";
+    const mode = (session as any).mode || (session.metadata as any)?.mode || "subscription";
+    const licenseId = (session.metadata as any)?.licenseId;
+    const quantity = (session.metadata as any)?.quantity
+      ? parseInt((session.metadata as any).quantity)
       : 1;
 
-    if (email && subscriptionId) {
+    if (email && mode === "subscription" && subscriptionId) {
+      const user = await User.findOne({ email });
+      if (user) {
+        // Retrieve subscription to determine each item (plan and quantity)
+        const sub = await stripe.subscriptions.retrieve(subscriptionId as string, {
+          expand: ["items.data.price"],
+        });
+
+        const allCreatedKeys: string[] = [];
+        let lastExpiry: Date | undefined = undefined;
+
+        for (const item of sub.items.data) {
+          const itemQuantity = item.quantity || 1;
+          const itemPlan = item.price?.nickname || plan || "monthly";
+          const { licenseKeys, expiryDate } = await createLicenses(
+            user._id as any,
+            sub.id,
+            sub.customer as any,
+            itemPlan,
+            itemQuantity
+          );
+          allCreatedKeys.push(...licenseKeys);
+          lastExpiry = expiryDate;
+        }
+        emailPayload = {
+          email,
+          data: buildLicenseEmail({
+            user,
+            licenseKeys: allCreatedKeys,
+            status: "active",
+            plan,
+            expiryDate: lastExpiry as Date,
+            action: "created",
+          }),
+        };
+      }
+    }
+
+    // One-time payment to renew a specific license
+    if (email && mode === "payment" && licenseId) {
+      const license = await License.findById(licenseId);
+      if (license) {
+        // Extend expiry and mark active
+        license.status = "active";
+        const now = new Date();
+        const base = license.expiryDate && license.expiryDate > now ? license.expiryDate : now;
+        // naive extend by plan
+        if (plan === "yearly") {
+          base.setFullYear(base.getFullYear() + 1);
+        } else if (plan === "quarterly") {
+          base.setMonth(base.getMonth() + 3);
+        } else {
+          base.setMonth(base.getMonth() + 1);
+        }
+        license.expiryDate = new Date(base);
+        await license.save();
+        const user = await User.findById(license.userId);
+        emailPayload = {
+          email: user.email,
+          data: buildLicenseEmail({
+            user,
+            licenseKeys: [license.licenseKey],
+            status: license.status,
+            plan: license.plan,
+            expiryDate: license.expiryDate,
+            action: "reactivated",
+          }),
+        };
+      }
+    }
+
+    // One-time purchase (first-time) — create new licenses without subscription
+    if (email && mode === "payment" && !licenseId) {
       const user = await User.findOne({ email });
       if (user) {
         const { licenseKeys, expiryDate } = await createLicenses(
-          user._id.toString(),
-          subscriptionId.toString(),
+          user._id as any,
+          null,
           customerId as Stripe.Customer,
           plan,
           quantity

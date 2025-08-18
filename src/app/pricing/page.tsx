@@ -12,14 +12,8 @@ export default function PricingPage() {
       name: "Monthly",
       price: 19,
       period: "mo",
-      description: "Perfect for getting started",
-      features: [
-        "Up to 10 devices",
-        "Email-based authentication",
-        "Basic dashboard",
-        "24/7 support",
-        "Basic analytics",
-      ],
+      description: "All features. Billed monthly.",
+      features: ["All features included"],
       popular: false,
       color: "from-blue-500 to-cyan-500",
     },
@@ -28,15 +22,8 @@ export default function PricingPage() {
       name: "Quarterly",
       price: 49,
       period: "qtr",
-      description: "Most popular choice",
-      features: [
-        "Up to 25 devices",
-        "Email-based authentication",
-        "Advanced dashboard",
-        "Priority support",
-        "Advanced analytics",
-        "API access",
-      ],
+      description: "All features. Billed every 3 months.",
+      features: ["All features included"],
       popular: true,
       color: "from-purple-500 to-pink-500",
     },
@@ -45,16 +32,8 @@ export default function PricingPage() {
       name: "Yearly",
       price: 179,
       period: "yr",
-      description: "Best value for teams",
-      features: [
-        "Unlimited devices",
-        "Email-based authentication",
-        "Premium dashboard",
-        "Dedicated support",
-        "Full analytics suite",
-        "API access",
-        "Custom integrations",
-      ],
+      description: "All features. Billed annually.",
+      features: ["All features included"],
       popular: false,
       color: "from-emerald-500 to-teal-500",
     },
@@ -140,8 +119,7 @@ export default function PricingPage() {
             Simple, Transparent Pricing
           </h1>
           <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Choose the plan that fits your needs. Upgrade or downgrade anytime
-            with no hidden fees.
+            One product, all features. Choose a billing period that suits you.
           </p>
         </motion.div>
 
@@ -244,7 +222,7 @@ export default function PricingPage() {
                 whileTap={{ scale: 0.98 }}
                 className="mt-auto"
               >
-                <Link href="/dashboard/downloads" className="block">
+                <Link href="/dashboard/licenses" className="block">
                   <Button
                     size="md"
                     className={`w-full ${
@@ -253,7 +231,7 @@ export default function PricingPage() {
                         : ""
                     }`}
                   >
-                    Get Started
+                    Choose {plan.name}
                   </Button>
                 </Link>
               </motion.div>

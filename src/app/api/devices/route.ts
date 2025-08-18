@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   await dbConnect();
 
   const devices = await Device.find({ userId })
-    .populate("licenseId", "licenseKey")
+    .populate("licenseId", "licenseKey status purchaseDate")
     .lean();
 
   return NextResponse.json({
@@ -19,6 +19,9 @@ export async function GET(req: NextRequest) {
       name: d.name,
       os: d.os,
       licenseKey: d.licenseId.licenseKey,
+      status: d.licenseId.status,
+      purchaseDate: d.licenseId.purchaseDate,
+      deviceGuid: d.deviceGuid,
       lastActivity: d.lastActivity,
     })),
   });

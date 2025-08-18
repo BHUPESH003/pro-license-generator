@@ -26,8 +26,8 @@ function CreatePasswordForm() {
     setLoading(true);
     try {
       await apiClient.post("/api/auth/create-password", { token, password });
-      setSuccess("Password set successfully! Redirecting to login...");
-      setTimeout(() => router.push("/login"), 2000);
+      setSuccess("Password set successfully! Redirecting...");
+      setTimeout(() => router.push(`/onboarding?token=${encodeURIComponent(token)}`), 1200);
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to set password");
     } finally {

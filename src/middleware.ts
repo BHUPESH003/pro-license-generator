@@ -27,6 +27,9 @@ export async function middleware(request: NextRequest) {
     "/api/auth/refresh-token",
     "/api/auth/logout",
     "/api/stripe/webhook",
+    "/api/licenses/activate-client",
+    "/api/user/profile",
+    "/api/telemetry/events",
   ];
 
   // ✅ Allow public API routes

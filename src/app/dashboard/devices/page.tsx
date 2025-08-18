@@ -36,7 +36,7 @@ export default function DevicesPage() {
       });
       setDevices((prev) =>
         prev.map((d) =>
-          d.deviceId === deviceId ? { ...d, deviceId: renameValue } : d
+          d.deviceId === deviceId ? { ...d, name: renameValue } : d
         )
       );
       setRenamingId(null);
@@ -139,13 +139,13 @@ export default function DevicesPage() {
                     </>
                   ) : (
                     <>
-                      {device.deviceId}
+                      {device.name}
                       <Button
                         size="sm"
                         variant="secondary"
                         onClick={() => {
                           setRenamingId(device.deviceId);
-                          setRenameValue(device.deviceId);
+                          setRenameValue(device.name);
                         }}
                       >
                         Rename
@@ -160,6 +160,14 @@ export default function DevicesPage() {
                       {device.licenseKey}
                     </span>
                   </span>
+                  {device.deviceGuid && (
+                    <span>
+                      GUID:{" "}
+                      <span className="font-mono bg-[var(--surface)] px-2 py-1 rounded border border-[var(--border)]">
+                        {device.deviceGuid}
+                      </span>
+                    </span>
+                  )}
                   <span>
                     Status:{" "}
                     <span
