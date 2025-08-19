@@ -4,6 +4,8 @@ import { jwtVerify } from "jose";
 
 interface DecodedToken {
   userId: string;
+  email?: string;
+  role?: string;
   [key: string]: any;
 }
 
@@ -30,7 +32,12 @@ export async function middleware(request: NextRequest) {
     "/api/licenses/activate-client",
     "/api/user/profile",
     "/api/telemetry/events",
+    "/api/admin/users", // Demo endpoint for DataTable testing
   ];
+
+  // Admin routes require admin role
+  const isAdminRoute =
+    pathname.startsWith("/api/admin/") || pathname.startsWith("/admin");
 
   // ✅ Allow public API routes
   if (
@@ -57,9 +64,26 @@ export async function middleware(request: NextRequest) {
 
     try {
       const decoded = await verifyJWT(token);
+
+      // Check admin role for admin routes
+      if (isAdminRoute && decoded.role !== "admin") {
+        return new NextResponse(
+          JSON.stringify({
+            success: false,
+            message: "Insufficient permissions. Admin access required.",
+            code: "AUTHORIZATION_FAILED",
+          }),
+          {
+            status: 403,
+            headers: { "content-type": "application/json" },
+          }
+        );
+      }
+
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set("x-user-id", decoded.userId);
       requestHeaders.set("x-user-email", decoded.email || "");
+      requestHeaders.set("x-user-role", decoded.role || "");
       return NextResponse.next({ request: { headers: requestHeaders } });
     } catch (err) {
       console.error("JWT verification failed:", err);
@@ -93,6 +117,26 @@ export async function middleware(request: NextRequest) {
 
   if (!sessionToken && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Admin page protection - redirect to login if not authenticated or not admin
+  if (pathname.startsWith("/admin")) {
+    if (!sessionToken) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    // For admin pages, we need to verify the role from the refresh token
+    // This is a basic check - full verification happens in the admin layout component
+    try {
+      const secret = new TextEncoder().encode(process.env.JWT_REFRESH_SECRET!);
+      const { payload } = await jwtVerify(sessionToken, secret);
+
+      if (payload.role !== "admin") {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
+    } catch (err) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
   }
 
   return NextResponse.next();

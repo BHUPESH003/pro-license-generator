@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 
 interface DecodedToken {
   userId: string;
+  email?: string;
+  role?: string;
   [key: string]: any;
 }
 
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Create a new access token
     const accessToken = jwt.sign(
-      { userId: decoded.userId, email: decoded.email }, // You can add more user details if needed
+      { userId: decoded.userId, email: decoded.email, role: decoded.role }, // Include role in new token
       process.env.JWT_SECRET!,
       { expiresIn: "15m" } // 15 minutes
     );

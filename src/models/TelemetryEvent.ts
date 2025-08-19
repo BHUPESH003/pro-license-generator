@@ -26,11 +26,21 @@ const TelemetryEventSchema = new Schema<ITelemetryEvent>({
   idempotencyKey: { type: String, unique: true, sparse: true },
 });
 
+// Existing indexes
 TelemetryEventSchema.index({ userId: 1, occurredAt: -1 });
 TelemetryEventSchema.index({ licenseId: 1, occurredAt: -1 });
 TelemetryEventSchema.index({ deviceGuid: 1, occurredAt: -1 });
 
+// Additional indexes for admin analytics queries
+TelemetryEventSchema.index({ eventType: 1, occurredAt: -1 });
+TelemetryEventSchema.index(
+  { idempotencyKey: 1 },
+  { unique: true, sparse: true }
+);
+
+// Compound indexes for complex admin queries
+TelemetryEventSchema.index({ userId: 1, eventType: 1, occurredAt: -1 });
+TelemetryEventSchema.index({ deviceGuid: 1, eventType: 1, occurredAt: -1 });
+
 export default mongoose.models.TelemetryEvent ||
   mongoose.model<ITelemetryEvent>("TelemetryEvent", TelemetryEventSchema);
-
-

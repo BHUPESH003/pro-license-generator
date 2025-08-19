@@ -5,9 +5,11 @@ export interface IDevice extends Document {
   name: string;
   os: string;
   deviceGuid?: string;
-  licenseId: mongoose.Types.ObjectId | ILicense; // <- Update this
+  licenseId: mongoose.Types.ObjectId | ILicense;
   userId: mongoose.Types.ObjectId;
   lastActivity: Date;
+  // New admin field
+  status?: "active" | "inactive";
 }
 
 const DeviceSchema = new Schema<IDevice>({
@@ -17,7 +19,47 @@ const DeviceSchema = new Schema<IDevice>({
   licenseId: { type: Schema.Types.ObjectId, ref: "License", required: true },
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   lastActivity: { type: Date, default: Date.now },
+  // New admin field
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    required: false,
+    default: "active",
+  },
 });
 
-export default mongoose.models.Device ||
+// Add indexes for admin query optimization
+DeviceSchema.index({ deviceGuid: 1 }, { unique: true, sparse: true });
+DeviceSchema.index({ userId: 1 });
+DeviceSchema.index({ licenseId: 1 });
+DeviceSchema.index({ lastActivity: -1 });
+DeviceSchema.index({ status: 1 });
+DeviceSchema.index({ os: 1 });
+DeviceSchema.index({ name: 1 });
+
+// Compound indexes for efficient admin search and filtering
+DeviceSchema.index({ status: 1, lastActivity: -1 });
+DeviceSchema.index({ userId: 1, status: 1 });
+DeviceSchema.index({ os: 1, status: 1 });
+
+// In dev, Next.js HMR can retain an older compiled model without new fields.
+// If a model already exists, ensure its schema has the new optional fields.
+const ExistingDeviceModel = mongoose.models.Device as
+  | mongoose.Model<IDevice>
+  | undefined;
+if (ExistingDeviceModel) {
+  const paths = ExistingDeviceModel.schema.paths as any;
+  if (!paths.status) {
+    ExistingDeviceModel.schema.add({
+      status: {
+        type: String,
+        enum: ["active", "inactive"],
+        required: false,
+        default: "active",
+      },
+    });
+  }
+}
+
+export default ExistingDeviceModel ||
   mongoose.model<IDevice>("Device", DeviceSchema);

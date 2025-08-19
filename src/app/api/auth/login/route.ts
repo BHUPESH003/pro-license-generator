@@ -43,14 +43,14 @@ export async function POST(req: NextRequest) {
     }
     // Create Access Token (short-lived)
     const accessToken = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET!,
       { expiresIn: "15m" } // 15 minutes
     );
 
     // Create Refresh Token (long-lived)
     const refreshToken = jwt.sign(
-      { userId: user._id, email: user.email }, // Keep payload minimal
+      { userId: user._id, email: user.email, role: user.role }, // Keep payload minimal
       process.env.JWT_REFRESH_SECRET!,
       { expiresIn: "7d" } // 7 days
     );
