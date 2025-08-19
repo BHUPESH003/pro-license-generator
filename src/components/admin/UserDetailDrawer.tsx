@@ -22,6 +22,7 @@ import {
   PowerOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import apiClient from "@/lib/axios";
 import { EntityDrawer } from "./EntityDrawer";
 
 interface UserDetail {
@@ -103,19 +104,7 @@ export default function UserDetailDrawer({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get(`/api/admin/users/${userId}`);
       if (!data.success) {
         throw new Error(data.message || "Failed to fetch user details");
       }
@@ -133,21 +122,10 @@ export default function UserDetailDrawer({
     if (!userId) return;
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/users/${userId}/actions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action, ...payload }),
+      const { data } = await apiClient.post(`/api/admin/users/${userId}/actions`, {
+        action,
+        ...payload,
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
       if (!data.success) {
         throw new Error(data.message || `Failed to ${action}`);
       }
@@ -181,24 +159,10 @@ export default function UserDetailDrawer({
     }
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/users/${userId}/role`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role: newRole,
-          confirmation: userDetail.user.email,
-        }),
+      const { data } = await apiClient.put(`/api/admin/users/${userId}/role`, {
+        role: newRole,
+        confirmation: userDetail.user.email,
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
       if (!data.success) {
         throw new Error(data.message || "Failed to change role");
       }

@@ -19,6 +19,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import apiClient from "@/lib/axios";
 
 interface ComponentHealth {
   status: "healthy" | "warning" | "critical";
@@ -81,18 +82,7 @@ export default function SystemHealth() {
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings/health", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch system health");
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get("/api/admin/settings/health");
       setHealthStatus(data.data);
     } catch (err) {
       setError(

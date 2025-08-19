@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import apiClient from "@/lib/axios";
 
 interface WebhookStatus {
   id: string;
@@ -79,18 +80,7 @@ export default function WebhookMonitoring() {
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings/webhooks", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch webhook status");
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get("/api/admin/settings/webhooks");
       setWebhookHealth(data.data);
     } catch (err) {
       setError(
@@ -110,19 +100,7 @@ export default function WebhookMonitoring() {
     setTesting(webhookId);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings/webhooks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ webhookId }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to test webhook");
-      }
+      await apiClient.post("/api/admin/settings/webhooks", { webhookId });
 
       // Refresh webhook status after test
       await fetchWebhookStatus(true);

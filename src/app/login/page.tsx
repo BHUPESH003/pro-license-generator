@@ -25,7 +25,8 @@ export default function LoginPage() {
       // Only redirect if the API confirms success
       if (res.data.success) {
         setAccessToken(res.data.accessToken);
-        router.push("/dashboard");
+        const isAdmin = res.data.role === "admin";
+        router.push(isAdmin ? "/admin" : "/dashboard");
       } else {
         // This is a fallback for unexpected responses
         setError("Login failed. Please try again.");

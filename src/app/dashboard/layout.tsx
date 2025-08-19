@@ -4,6 +4,7 @@ import ReduxProvider from "@/store/provider";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import apiClient from "@/lib/axios";
 import {
   LayoutDashboard,
   Key,
@@ -25,7 +26,7 @@ const sidebarLinks = [
 ];
 
 async function handleLogout(router: any) {
-  await fetch("/api/auth/logout", { method: "POST" });
+  await apiClient.post("/api/auth/logout");
   localStorage.removeItem("accessToken"); // clear manually
   router.push("/login");
 }

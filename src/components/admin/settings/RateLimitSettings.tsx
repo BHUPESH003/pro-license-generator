@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import apiClient from "@/lib/axios";
 
 interface RateLimitSettingsProps {
   onSettingsChange: () => void;
@@ -56,18 +57,7 @@ export default function RateLimitSettings({
 
   const fetchRateLimits = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings/rate-limits", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch rate limits");
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get("/api/admin/settings/rate-limits");
       setConfig(data.data);
     } catch (err) {
       setError(
@@ -110,20 +100,7 @@ export default function RateLimitSettings({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings/rate-limits", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ config }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save rate limits");
-      }
+      await apiClient.put("/api/admin/settings/rate-limits", { config });
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);

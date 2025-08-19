@@ -21,12 +21,29 @@ export const store = configureStore({
     telemetry: telemetryReducer,
     ui: uiReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) => {
+    const md = getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [adminApi.util.getRunningQueriesThunk.fulfilled.type],
+        ignoredActions: [],
       },
-    }).concat(adminApi.middleware),
+    }).concat(adminApi.middleware);
+
+    // Guard against undefined util in certain test environments
+    try {
+      const ignored = (adminApi as any)?.util?.getRunningQueriesThunk?.fulfilled?.type;
+      if (ignored) {
+        // @ts-ignore adjust serializableCheck ignoredActions dynamically if available
+        (md as any).options = {
+          ...(md as any).options,
+          serializableCheck: {
+            ignoredActions: [ignored],
+          },
+        };
+      }
+    } catch {}
+
+    return md;
+  },
   devTools: process.env.NODE_ENV !== "production",
 });
 

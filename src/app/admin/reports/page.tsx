@@ -23,6 +23,7 @@ import ActiveDevicesChart from "@/components/admin/reports/ActiveDevicesChart";
 import FinancialChart from "@/components/admin/reports/FinancialChart";
 import TimeRangeSelector from "@/components/admin/reports/TimeRangeSelector";
 import { KPICard } from "@/components/admin/KPICard";
+import apiClient from "@/lib/axios";
 
 interface PlanMixData {
   planMixData: Array<{
@@ -136,44 +137,31 @@ export default function ReportsPage() {
   // Load all report data
   const loadReportData = useCallback(async () => {
     try {
-      const token = localStorage.getItem("accessToken");
       const dateRange = getDateRange();
 
       const [planMixResponse, activeDevicesResponse, financialResponse] =
         await Promise.all([
-          fetch(
-            `/api/admin/reports/plan-mix?from=${dateRange.from}&to=${dateRange.to}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `/api/admin/reports/active-devices?from=${dateRange.from}&to=${dateRange.to}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `/api/admin/reports/financial?from=${dateRange.from}&to=${dateRange.to}&includeStripe=true`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
+          apiClient.get(`/api/admin/reports/plan-mix`, {
+            params: { from: dateRange.from, to: dateRange.to },
+          }),
+          apiClient.get(`/api/admin/reports/active-devices`, {
+            params: { from: dateRange.from, to: dateRange.to },
+          }),
+          apiClient.get(`/api/admin/reports/financial`, {
+            params: { from: dateRange.from, to: dateRange.to, includeStripe: true },
+          }),
         ]);
 
-      if (planMixResponse.ok) {
-        const data = await planMixResponse.json();
-        setPlanMixData(data.data);
+      if (planMixResponse.status >= 200 && planMixResponse.status < 300) {
+        setPlanMixData(planMixResponse.data.data);
       }
 
-      if (activeDevicesResponse.ok) {
-        const data = await activeDevicesResponse.json();
-        setActiveDevicesData(data.data);
+      if (activeDevicesResponse.status >= 200 && activeDevicesResponse.status < 300) {
+        setActiveDevicesData(activeDevicesResponse.data.data);
       }
 
-      if (financialResponse.ok) {
-        const data = await financialResponse.json();
-        setFinancialData(data.data);
+      if (financialResponse.status >= 200 && financialResponse.status < 300) {
+        setFinancialData(financialResponse.data.data);
       }
     } catch (error) {
       console.error("Failed to load report data:", error);
@@ -205,35 +193,23 @@ export default function ReportsPage() {
   const handleExport = useCallback(
     async (reportType: string) => {
       try {
-        const token = localStorage.getItem("accessToken");
         const dateRange = getDateRange();
-        const url = new URL(
-          `/api/admin/reports/export`,
-          window.location.origin
-        );
-        url.searchParams.set("type", reportType);
-        url.searchParams.set("from", dateRange.from);
-        url.searchParams.set("to", dateRange.to);
-
-        const response = await fetch(url.toString(), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await apiClient.get(`/api/admin/reports/export`, {
+          params: { type: reportType, from: dateRange.from, to: dateRange.to },
+          responseType: "blob",
         });
 
-        if (response.ok) {
-          const blob = await response.blob();
-          const downloadUrl = window.URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = downloadUrl;
-          link.download = `${reportType}-export-${
-            new Date().toISOString().split("T")[0]
-          }.csv`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(downloadUrl);
-        }
+        const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = `${reportType}-export-${
+          new Date().toISOString().split("T")[0]
+        }.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
       } catch (error) {
         console.error("Export failed:", error);
       }

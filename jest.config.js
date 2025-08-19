@@ -1,3 +1,19 @@
+/** @type {import('jest').Config} */
+module.exports = {
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: { isolatedModules: true } }],
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(jose)/)',
+  ],
+  setupFilesAfterEnv: [],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+};
+
 const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
@@ -14,7 +30,7 @@ const customJestConfig = {
     "<rootDir>/node_modules/",
     "<rootDir>/e2e/",
   ],
-  moduleNameMapping: {
+  moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   collectCoverageFrom: [

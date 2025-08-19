@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import apiClient from "@/lib/axios";
 
 interface SystemConfigurationProps {
   onSettingsChange: () => void;
@@ -86,18 +87,7 @@ export default function SystemConfiguration({
 
   const fetchConfiguration = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings/config", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch configuration");
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get("/api/admin/settings/config");
       setConfig(data.data);
     } catch (err) {
       setError(
@@ -153,20 +143,7 @@ export default function SystemConfiguration({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings/config", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ config }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save configuration");
-      }
+      await apiClient.put("/api/admin/settings/config", { config });
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);

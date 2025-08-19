@@ -17,6 +17,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import apiClient from "@/lib/axios";
 import { JsonViewer } from "@/components/admin/JsonViewer";
 
 interface AuditDetailDrawerProps {
@@ -68,18 +69,7 @@ export default function AuditDetailDrawer({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/audit/${auditId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch audit log details");
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get(`/api/admin/audit/${auditId}`);
       setAuditLog(data.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load audit log");

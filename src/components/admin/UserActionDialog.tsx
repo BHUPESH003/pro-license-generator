@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import apiClient from "@/lib/axios";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 interface UserActionDialogProps {
@@ -63,19 +64,7 @@ export default function UserActionDialog({
     if (!userId) return;
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get(`/api/admin/users/${userId}`);
       if (data.success) {
         setUser(data.data.user);
       }
@@ -91,34 +80,22 @@ export default function UserActionDialog({
 
     try {
       let endpoint = `/api/admin/users/${userId}`;
-      let method = "POST";
+      let method: "post" | "put" = "post";
       let body: any = { action: actionType, ...payload };
 
       // Special handling for role changes
       if (actionType === "change_role") {
         endpoint = `/api/admin/users/${userId}/role`;
-        method = "PUT";
+        method = "put";
         body = {
           role: payload.role,
           confirmation: payload.confirmation,
         };
       }
 
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await (method === "post"
+        ? apiClient.post(endpoint, body)
+        : apiClient.put(endpoint, body));
       if (!data.success) {
         throw new Error(data.message || `Failed to ${actionType}`);
       }

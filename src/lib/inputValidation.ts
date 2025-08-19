@@ -365,15 +365,23 @@ export async function validateRequestBody(
   req: NextRequest,
   schema: ValidationSchema
 ): Promise<any> {
+  // Read raw body text first to distinguish between JSON parse errors and validation errors
+  let text: string;
   try {
-    const body = await req.json();
-    return validateObject(body, schema);
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
+    text = await req.text();
+  } catch {
     throw new ValidationError("Invalid JSON body", "body", "INVALID_JSON");
   }
+
+  let parsed: any;
+  try {
+    parsed = text ? JSON.parse(text) : {};
+  } catch {
+    throw new ValidationError("Invalid JSON body", "body", "INVALID_JSON");
+  }
+
+  // Run schema validation, allowing it to throw specific field errors like FIELD_REQUIRED
+  return validateObject(parsed, schema);
 }
 
 /**

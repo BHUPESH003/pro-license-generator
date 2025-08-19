@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import apiClient from "@/lib/axios";
 import { Shield, AlertTriangle, Loader2 } from "lucide-react";
 
 interface AdminProtectionProps {
@@ -31,10 +32,9 @@ export function AdminProtection({ children }: AdminProtectionProps) {
         }
 
         // Verify token and admin role with the server
-        const response = await fetch("/api/auth/verify-admin", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await apiClient.get("/api/auth/verify-admin", {
+          // Let interceptor attach token; keep compatibility if needed
+          validateStatus: () => true,
         });
 
         if (response.status === 401) {
@@ -51,11 +51,11 @@ export function AdminProtection({ children }: AdminProtectionProps) {
           return;
         }
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error("Failed to verify admin access");
         }
 
-        const data = await response.json();
+        const data = response.data;
 
         if (data.success && data.user?.role === "admin") {
           setIsAuthorized(true);

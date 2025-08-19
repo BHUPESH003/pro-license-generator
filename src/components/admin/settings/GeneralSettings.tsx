@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Save, AlertCircle, CheckCircle, Settings } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import apiClient from "@/lib/axios";
 
 interface GeneralSettingsProps {
   onSettingsChange: () => void;
@@ -50,18 +51,7 @@ export default function GeneralSettings({
 
   const fetchSettings = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch settings");
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get("/api/admin/settings");
       setSettings(data.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load settings");
@@ -94,20 +84,7 @@ export default function GeneralSettings({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/settings", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ settings }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save settings");
-      }
+      await apiClient.put("/api/admin/settings", { settings });
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);

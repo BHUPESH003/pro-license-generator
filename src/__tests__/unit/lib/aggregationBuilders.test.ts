@@ -156,10 +156,11 @@ describe("AggregationBuilder", () => {
         .paginate({ page: 1, pageSize: 10 })
         .build();
 
-      expect(pipeline).toHaveLength(3);
+      expect(pipeline).toHaveLength(4);
       expect(pipeline[0]).toEqual({ $match: { status: "active" } });
       expect(pipeline[1]).toEqual({ $sort: { createdAt: -1 } });
       expect(pipeline[2]).toEqual({ $skip: 0 });
+      expect(pipeline[3]).toEqual({ $limit: 10 });
     });
   });
 

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import apiClient from "@/lib/axios";
 
 interface AdminUser {
   _id: string;
@@ -117,12 +118,9 @@ export default function AdminUserDialog({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
       const url = isEditing
         ? `/api/admin/settings/admins/${admin!._id}`
         : "/api/admin/settings/admins";
-
-      const method = isEditing ? "PUT" : "POST";
 
       const body: any = {
         email: formData.email.trim(),
@@ -133,18 +131,10 @@ export default function AdminUserDialog({
         body.password = formData.password;
       }
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save admin user");
+      if (isEditing) {
+        await apiClient.put(url, body);
+      } else {
+        await apiClient.post(url, body);
       }
 
       setSuccess(true);

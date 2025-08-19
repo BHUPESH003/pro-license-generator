@@ -17,6 +17,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Button } from "../ui/Button";
+import apiClient from "@/lib/axios";
 
 interface LicenseDetail {
   _id: string;
@@ -95,19 +96,7 @@ export function LicenseDetailDrawer({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/licenses/${licenseId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get(`/api/admin/licenses/${licenseId}`);
       if (!data.success) {
         throw new Error(data.message || "Failed to fetch license details");
       }
@@ -132,21 +121,10 @@ export function LicenseDetailDrawer({
     setActionLoading(true);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/licenses/${licenseId}/actions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action, reason }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.post(
+        `/api/admin/licenses/${licenseId}/actions`,
+        { action, reason }
+      );
       if (!data.success) {
         throw new Error(data.message || "Failed to perform action");
       }

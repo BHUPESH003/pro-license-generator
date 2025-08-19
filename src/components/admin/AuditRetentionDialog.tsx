@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import apiClient from "@/lib/axios";
 
 interface AuditRetentionDialogProps {
   isOpen: boolean;
@@ -70,18 +71,7 @@ export default function AuditRetentionDialog({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/audit/retention", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch retention policy");
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get("/api/admin/audit/retention");
       setPolicy(data.data);
     } catch (err) {
       setError(
@@ -102,20 +92,7 @@ export default function AuditRetentionDialog({
     setSuccess(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/audit/retention", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ policy }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save retention policy");
-      }
+      await apiClient.put("/api/admin/audit/retention", { policy });
 
       setSuccess("Retention policy updated successfully");
       onRetentionUpdate();
@@ -134,23 +111,10 @@ export default function AuditRetentionDialog({
     setCleanupResult(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(
-        `/api/admin/audit/retention?dryRun=true&retentionDays=${policy.retentionDays}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const { data } = await apiClient.delete(
+        `/api/admin/audit/retention`,
+        { params: { dryRun: true, retentionDays: policy.retentionDays } }
       );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to preview cleanup");
-      }
-
-      const data = await response.json();
       setCleanupResult(data.data);
     } catch (err) {
       setError(
@@ -166,23 +130,10 @@ export default function AuditRetentionDialog({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(
-        `/api/admin/audit/retention?retentionDays=${policy.retentionDays}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const { data } = await apiClient.delete(
+        `/api/admin/audit/retention`,
+        { params: { retentionDays: policy.retentionDays } }
       );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to execute cleanup");
-      }
-
-      const data = await response.json();
       setCleanupResult(data.data);
       setSuccess(
         `Successfully deleted ${data.data.deletedCount} audit records`

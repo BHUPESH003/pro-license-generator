@@ -111,12 +111,35 @@ export async function middleware(request: NextRequest) {
     "/create-password",
   ].includes(pathname);
 
+  // When a user has a refresh token, decide redirect based on role claim
   if (sessionToken && isPublicPage) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    try {
+      const secret = new TextEncoder().encode(process.env.JWT_REFRESH_SECRET!);
+      const { payload } = await jwtVerify(sessionToken, secret);
+      const role = (payload as any)?.role;
+      const dest = role === "admin" ? "/admin" : "/dashboard";
+      return NextResponse.redirect(new URL(dest, request.url));
+    } catch {
+      // fall through to next()
+    }
   }
 
-  if (!sessionToken && pathname.startsWith("/dashboard")) {
+  if (!sessionToken && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Block non-admin access to /admin when logged in as non-admin
+  if (sessionToken && pathname.startsWith("/admin")) {
+    try {
+      const secret = new TextEncoder().encode(process.env.JWT_REFRESH_SECRET!);
+      const { payload } = await jwtVerify(sessionToken, secret);
+      const role = (payload as any)?.role;
+      if (role !== "admin") {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+      }
+    } catch {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
   }
 
   // Admin page protection - redirect to login if not authenticated or not admin

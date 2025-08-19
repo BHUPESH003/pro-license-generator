@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import apiClient from "@/lib/axios";
 
 interface MetricsOverview {
   users: {
@@ -66,23 +67,9 @@ export function useAdminMetrics(
 
   const fetchOverview = useCallback(async (days: number = 30) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        throw new Error("No access token found");
-      }
-
-      const response = await fetch(`/api/admin/metrics/overview?days=${days}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+      const { data } = await apiClient.get(`/api/admin/metrics/overview`, {
+        params: { days },
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
 
       if (!data.success) {
         throw new Error(data.message || "Failed to fetch overview metrics");
@@ -101,26 +88,9 @@ export function useAdminMetrics(
   const fetchTimeSeries = useCallback(
     async (days: number = 30, granularity: string = "day") => {
       try {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          throw new Error("No access token found");
-        }
-
-        const response = await fetch(
-          `/api/admin/metrics/timeseries?days=${days}&granularity=${granularity}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const { data } = await apiClient.get(`/api/admin/metrics/timeseries`, {
+          params: { days, granularity },
+        });
 
         if (!data.success) {
           throw new Error(

@@ -20,6 +20,7 @@ import { DataTable } from "@/components/admin/DataTable";
 import { FilterConfig, ActionConfig } from "@/components/admin/types";
 import AdminUserDialog from "./AdminUserDialog";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
+import apiClient from "@/lib/axios";
 
 interface AdminUser {
   _id: string;
@@ -190,21 +191,7 @@ export default function AdminManagement() {
 
     setIsDeleting(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(
-        `/api/admin/settings/admins/${adminToDelete._id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to delete admin");
-      }
+      await apiClient.delete(`/api/admin/settings/admins/${adminToDelete._id}`);
 
       // Refresh the table
       setRefreshKey((prev) => prev + 1);

@@ -21,6 +21,7 @@ import { DataTable } from "@/components/admin/DataTable";
 import DeviceDetailDrawer from "@/components/admin/DeviceDetailDrawer";
 import { FilterConfig, ActionConfig } from "@/components/admin/types";
 import { Button } from "@/components/ui/Button";
+import apiClient from "@/lib/axios";
 
 interface Device {
   _id: string;
@@ -322,21 +323,10 @@ export default function DevicesPage() {
         payload.reason = reason;
       }
 
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/devices/${deviceId}/actions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.post(
+        `/api/admin/devices/${deviceId}/actions`,
+        payload
+      );
       if (!data.success) {
         throw new Error(data.message || `Failed to ${action} device`);
       }

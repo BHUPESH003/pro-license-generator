@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import apiClient from "@/lib/axios";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -73,7 +74,7 @@ const adminSidebarLinks = [
 
 async function handleLogout(router: any) {
   try {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await apiClient.post("/api/auth/logout");
     localStorage.removeItem("accessToken");
     router.push("/login");
   } catch (error) {

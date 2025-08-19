@@ -22,6 +22,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { Button } from "../ui/Button";
+import apiClient from "@/lib/axios";
 
 interface DeviceDetail {
   _id: string;
@@ -108,19 +109,7 @@ export function DeviceDetailDrawer({
     setError(null);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/devices/${deviceId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.get(`/api/admin/devices/${deviceId}`);
       if (!data.success) {
         throw new Error(data.message || "Failed to fetch device details");
       }
@@ -145,21 +134,10 @@ export function DeviceDetailDrawer({
     setActionLoading(true);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/devices/${deviceId}/actions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action, ...payload }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const { data } = await apiClient.post(
+        `/api/admin/devices/${deviceId}/actions`,
+        { action, ...payload }
+      );
       if (!data.success) {
         throw new Error(data.message || "Failed to perform action");
       }

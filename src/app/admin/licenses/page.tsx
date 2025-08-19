@@ -19,6 +19,7 @@ import { DataTable } from "@/components/admin/DataTable";
 import LicenseDetailDrawer from "@/components/admin/LicenseDetailDrawer";
 import { FilterConfig, ActionConfig } from "@/components/admin/types";
 import { Button } from "@/components/ui/Button";
+import apiClient from "@/lib/axios";
 
 interface License {
   _id: string;
@@ -263,24 +264,13 @@ export default function LicensesPage() {
     action: "activate" | "deactivate"
   ) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`/api/admin/licenses/${licenseId}/actions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const { data } = await apiClient.post(
+        `/api/admin/licenses/${licenseId}/actions`,
+        {
           action,
           reason: `Quick ${action} from license management`,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+        }
+      );
       if (!data.success) {
         throw new Error(data.message || `Failed to ${action} license`);
       }

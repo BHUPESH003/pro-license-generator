@@ -170,7 +170,12 @@ export function sanitizePayload(payload: any): any {
   }
 
   const sensitiveFields = ["password", "token", "secret", "key", "auth"];
-  const sanitized = { ...payload };
+  // Handle arrays explicitly to preserve array structure
+  if (Array.isArray(payload)) {
+    return payload.map((item) => sanitizePayload(item));
+  }
+
+  const sanitized: any = { ...payload };
 
   for (const field of sensitiveFields) {
     if (field in sanitized) {

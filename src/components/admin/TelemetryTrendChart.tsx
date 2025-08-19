@@ -24,6 +24,7 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
 } from "lucide-react";
+import apiClient from "@/lib/axios";
 
 interface TelemetryVolumeData {
   date: string;
@@ -81,7 +82,6 @@ export default function TelemetryTrendChart({
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem("accessToken");
       const url = new URL(
         "/api/admin/telemetry/summary",
         window.location.origin
@@ -103,20 +103,8 @@ export default function TelemetryTrendChart({
         }
       });
 
-      const response = await fetch(url.toString(), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to load telemetry summary: ${response.statusText}`
-        );
-      }
-
-      const result = await response.json();
-      setData(result.data);
+      const { data } = await apiClient.get(url.toString());
+      setData(data.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {

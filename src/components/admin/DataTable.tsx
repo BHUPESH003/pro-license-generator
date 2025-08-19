@@ -10,6 +10,7 @@ import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { FilterConfig, ActionConfig, TableResponse } from "./types";
 import { useTableState } from "./useTableState";
+import apiClient from "@/lib/axios";
 import { downloadCsv } from "./utils";
 
 export interface DataTableProps<T = any> {
@@ -77,18 +78,9 @@ export function DataTable<T = any>({
         }
       });
 
-      const response = await fetch(`${endpoint}?${queryParams.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          "Content-Type": "application/json",
-        },
+      const { data } = await apiClient.get(`${endpoint}`, {
+        params: Object.fromEntries(queryParams.entries()),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: TableResponse<T> = await response.json();
 
       if (!data.success) {
         throw new Error(data.message || "Failed to fetch data");
@@ -171,17 +163,11 @@ export function DataTable<T = any>({
         }
       });
 
-      const response = await fetch(`${endpoint}?${queryParams.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+      const { data } = await apiClient.get(`${endpoint}`, {
+        params: Object.fromEntries(queryParams.entries()),
+        responseType: "text",
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const csvData = await response.text();
+      const csvData = data;
       const filename = `export-${new Date().toISOString().split("T")[0]}.csv`;
       downloadCsv(csvData, filename);
     } catch (error) {
