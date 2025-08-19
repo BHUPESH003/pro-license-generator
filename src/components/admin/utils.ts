@@ -218,7 +218,7 @@ export function createDateColumn(
     width,
     valueFormatter: (params: any) => formatTableDate(params.value),
     sortable: true,
-    filter: "agDateColumnFilter",
+    filter: true,
   };
 }
 
@@ -233,7 +233,7 @@ export function createStatusColumn(
     width,
     valueFormatter: (params: any) => formatStatus(params.value),
     sortable: true,
-    filter: "agSetColumnFilter",
+    filter: true,
   };
 }
 
@@ -248,6 +248,6 @@ export function createCurrencyColumn(
     width,
     valueFormatter: (params: any) => formatCurrency(params.value),
     sortable: true,
-    filter: "agNumberColumnFilter",
+    filter: true,
   };
 }

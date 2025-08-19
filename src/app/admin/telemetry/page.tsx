@@ -21,6 +21,7 @@ import TelemetryTrendChart from "@/components/admin/TelemetryTrendChart";
 import { FilterConfig, ActionConfig } from "@/components/admin/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import apiClient from "@/lib/axios";
 
 interface TelemetryEvent {
   _id: string;
@@ -78,17 +79,8 @@ export default function TelemetryPage() {
   // Load telemetry stats
   const loadStats = useCallback(async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch("/api/admin/telemetry/stats", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data.data);
-      }
+      const { data } = await apiClient.get("/api/admin/telemetry/stats");
+      setStats(data.data);
     } catch (error) {
       console.error("Failed to load telemetry stats:", error);
     }
@@ -116,42 +108,32 @@ export default function TelemetryPage() {
 
   const handleExport = useCallback(async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      const url = new URL(
-        "/api/admin/telemetry/events",
-        window.location.origin
-      );
-      url.searchParams.set("export", "csv");
-
-      // Add current filters from the table state
+      const params: Record<string, any> = { export: "csv" };
       const tableState = (window as any).telemetryTableState;
       if (tableState?.filters) {
         Object.entries(tableState.filters).forEach(([key, value]) => {
-          if (value) {
-            url.searchParams.set(`filter_${key}`, value as string);
+          if (value !== undefined && value !== null && value !== "") {
+            params[`filter_${key}`] = value;
           }
         });
       }
 
-      const response = await fetch(url.toString(), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await apiClient.get("/api/admin/telemetry/events", {
+        params,
+        responseType: "blob",
       });
 
-      if (response.ok) {
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = downloadUrl;
-        link.download = `telemetry-events-${
-          new Date().toISOString().split("T")[0]
-        }.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(downloadUrl);
-      }
+      const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `telemetry-events-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Export failed:", error);
     }
@@ -160,53 +142,53 @@ export default function TelemetryPage() {
   const filters: FilterConfig[] = useMemo(
     () => [
       {
-        key: "deviceGuid",
+        field: "deviceGuid",
         label: "Device GUID",
         type: "text",
         placeholder: "Search by device GUID...",
       },
       {
-        key: "licenseKey",
+        field: "licenseKey",
         label: "License Key",
         type: "text",
         placeholder: "Search by license key...",
       },
       {
-        key: "userEmail",
+        field: "userEmail",
         label: "User Email",
         type: "text",
         placeholder: "Search by user email...",
       },
       {
-        key: "eventType",
+        field: "eventType",
         label: "Event Type",
         type: "text",
         placeholder: "Search by event type...",
       },
       {
-        key: "occurredAfter",
+        field: "occurredAfter",
         label: "From Date",
         type: "date",
       },
       {
-        key: "occurredBefore",
+        field: "occurredBefore",
         label: "To Date",
         type: "date",
       },
       {
-        key: "appVersion",
+        field: "appVersion",
         label: "App Version",
         type: "text",
         placeholder: "Search by app version...",
       },
       {
-        key: "os",
+        field: "os",
         label: "Operating System",
         type: "text",
         placeholder: "Search by OS...",
       },
       {
-        key: "sessionId",
+        field: "sessionId",
         label: "Session ID",
         type: "text",
         placeholder: "Search by session ID...",
@@ -219,7 +201,7 @@ export default function TelemetryPage() {
     () => [
       {
         label: "View Details",
-        icon: Eye,
+        icon: <Eye className="h-4 w-4" />,
         onClick: (event) => setSelectedEvent(event),
         variant: "primary",
       },

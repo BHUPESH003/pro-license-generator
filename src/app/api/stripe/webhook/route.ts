@@ -119,9 +119,9 @@ export async function POST(req: NextRequest) {
         await license.save();
         const user = await User.findById(license.userId);
         emailPayload = {
-          email: user.email,
+          email: user?.email || email!,
           data: buildLicenseEmail({
-            user,
+            user: user as any,
             licenseKeys: [license.licenseKey],
             status: license.status,
             plan: license.plan,
@@ -170,9 +170,9 @@ export async function POST(req: NextRequest) {
       if (licenses.length > 0) {
         const user = await User.findById(licenses[0].userId);
         emailPayload = {
-          email: user.email,
+          email: user?.email || "",
           data: buildLicenseEmail({
-            user,
+            user: user as any,
             licenseKeys: licenses.map((l) => l.licenseKey),
             status: "active",
             plan: licenses[0].plan,
@@ -199,9 +199,9 @@ export async function POST(req: NextRequest) {
       if (licenses.length > 0) {
         const user = await User.findById(licenses[0].userId);
         emailPayload = {
-          email: user.email,
+          email: user?.email || "",
           data: buildLicenseEmail({
-            user,
+            user: user as any,
             licenseKeys: licenses.map((l) => l.licenseKey),
             status: "inactive",
             plan: licenses[0].plan,
@@ -249,9 +249,9 @@ export async function POST(req: NextRequest) {
     if (updatedLicenses.length > 0) {
       const user = await User.findById(updatedLicenses[0].userId);
       emailPayload = {
-        email: user.email,
+        email: user?.email || "",
         data: buildLicenseEmail({
-          user,
+          user: user as any,
           licenseKeys: updatedLicenses.map((l) => l.licenseKey),
           status: updatedLicenses[0].status,
           plan: updatedLicenses[0].plan,

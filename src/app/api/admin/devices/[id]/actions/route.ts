@@ -64,7 +64,10 @@ export async function POST(
     }
 
     // Fetch the device with license information
-    const device = await Device.findById(deviceId).populate("licenseId");
+    const device = await Device.findById(deviceId).populate(
+      "licenseId",
+      "licenseKey"
+    );
     if (!device) {
       return NextResponse.json(
         { success: false, message: "Device not found" },
@@ -170,9 +173,19 @@ export async function POST(
           licenseId: device.licenseId,
         });
 
-        previousValue = `Bound to license ${device.licenseId.licenseKey}`;
+        // Safely determine the bound license key regardless of populate state
+        let boundLicenseKey: string | undefined;
+        const licenseRef: any = device.licenseId as any;
+        if (licenseRef && typeof licenseRef === "object" && "licenseKey" in licenseRef) {
+          boundLicenseKey = licenseRef.licenseKey as string;
+        } else if (device.licenseId) {
+          const lic = await License.findById(device.licenseId).select("licenseKey");
+          boundLicenseKey = lic?.licenseKey;
+        }
+
+        previousValue = `Bound to license ${boundLicenseKey ?? "unknown"}`;
         newValue = "Unbound";
-        actionDescription = `Device unbound from license ${device.licenseId.licenseKey} - Reason: ${body.reason}`;
+        actionDescription = `Device unbound from license ${boundLicenseKey ?? "unknown"} - Reason: ${body.reason}`;
         auditAction = "device_unbound";
 
         // For unbind, we'll delete the device record entirely
@@ -190,7 +203,7 @@ export async function POST(
             reason: body.reason,
             deviceName: device.name,
             deviceGuid: device.deviceGuid,
-            licenseKey: device.licenseId.licenseKey,
+            licenseKey: boundLicenseKey,
             previousValue,
             newValue,
             timestamp: new Date(),
@@ -264,7 +277,9 @@ export async function POST(
         success: false,
         message: "Failed to perform device action",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );
@@ -293,7 +308,7 @@ export async function GET(
     // Fetch the device
     const device = await Device.findById(deviceId)
       .populate("licenseId", "licenseKey status")
-      .select("name status deviceGuid");
+      .select("name status deviceGuid licenseId");
 
     if (!device) {
       return NextResponse.json(
@@ -348,13 +363,20 @@ export async function GET(
         "This action will permanently remove the device from the system and cannot be undone.",
     });
 
+    // Safely read license key in case populate typing is a union
+    const populatedLicense: any = (device as any).licenseId;
+    const populatedLicenseKey: string | undefined =
+      populatedLicense && typeof populatedLicense === "object"
+        ? populatedLicense.licenseKey
+        : undefined;
+
     return NextResponse.json({
       success: true,
       data: {
         deviceId,
         deviceName: device.name,
         currentStatus: device.status,
-        licenseKey: device.licenseId?.licenseKey,
+        licenseKey: populatedLicenseKey,
         availableActions,
       },
     });
@@ -365,7 +387,9 @@ export async function GET(
         success: false,
         message: "Failed to fetch device actions",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );

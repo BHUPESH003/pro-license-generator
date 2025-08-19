@@ -14,13 +14,13 @@ export async function GET(req: NextRequest) {
     .lean();
 
   return NextResponse.json({
-    devices: devices.map((d) => ({
+    devices: devices.map((d: any) => ({
       deviceId: d._id,
       name: d.name,
       os: d.os,
-      licenseKey: d.licenseId.licenseKey,
-      status: d.licenseId.status,
-      purchaseDate: d.licenseId.purchaseDate,
+      licenseKey: (d.licenseId as any)?.licenseKey,
+      status: (d.licenseId as any)?.status,
+      purchaseDate: (d.licenseId as any)?.purchaseDate,
       deviceGuid: d.deviceGuid,
       lastActivity: d.lastActivity,
     })),

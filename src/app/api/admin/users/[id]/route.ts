@@ -118,11 +118,11 @@ async function getUserDetailHandler(
 async function updateUserHandler(
   request: NextRequest,
   admin: any,
-  { params }: UserDetailParams
+  context: { params: Promise<{ id: string }> }
 ) {
   await dbConnect();
 
-  const { id } = params;
+  const { id } = await context.params;
 
   // Validate ObjectId
   if (!mongoose.Types.ObjectId.isValid(id)) {

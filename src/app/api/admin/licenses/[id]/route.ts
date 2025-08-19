@@ -119,11 +119,15 @@ export async function GET(
     const activityTimeline: LicenseDetail["activityTimeline"] = [];
 
     // Add license creation event
+    const licenseCreatedAt: Date = (
+      license._id as unknown as mongoose.Types.ObjectId
+    ).getTimestamp();
+
     activityTimeline.push({
       _id: `license_created_${license._id}`,
       type: "license_created",
       description: `License created for plan: ${license.plan}`,
-      timestamp: license.purchaseDate || license._id.getTimestamp(),
+      timestamp: license.purchaseDate || licenseCreatedAt,
       metadata: {
         plan: license.plan,
         mode: license.mode,
@@ -132,7 +136,7 @@ export async function GET(
     });
 
     // Add audit log events
-    auditLogs.forEach((audit) => {
+    auditLogs.forEach((audit: any) => {
       let description = "";
       let type: LicenseDetail["activityTimeline"][0]["type"] = "admin_action";
 
@@ -155,15 +159,15 @@ export async function GET(
       }
 
       activityTimeline.push({
-        _id: audit._id.toString(),
+        _id: (audit._id as any).toString(),
         type,
         description,
         timestamp: audit.createdAt,
         actor: audit.actorUserId
           ? {
-              _id: audit.actorUserId._id.toString(),
-              email: audit.actorUserId.email,
-              name: audit.actorUserId.name,
+              _id: (audit.actorUserId._id as any).toString(),
+              email: (audit.actorUserId as any).email,
+              name: (audit.actorUserId as any).name,
             }
           : undefined,
         metadata: audit.payload,
@@ -172,11 +176,14 @@ export async function GET(
 
     // Add device events (when devices were added/removed)
     devices.forEach((device) => {
+      const deviceCreatedAt: Date = (
+        device._id as unknown as mongoose.Types.ObjectId
+      ).getTimestamp();
       activityTimeline.push({
         _id: `device_added_${device._id}`,
         type: "device_added",
         description: `Device "${device.name}" (${device.os}) connected`,
-        timestamp: device._id.getTimestamp(),
+        timestamp: deviceCreatedAt,
         metadata: {
           deviceId: device._id.toString(),
           deviceName: device.name,
@@ -230,10 +237,11 @@ export async function GET(
     const lastEventDate =
       telemetryEvents.length > 0 ? telemetryEvents[0].occurredAt : undefined;
     const daysActive = Math.floor(
-      (Date.now() -
-        (license.purchaseDate || license._id.getTimestamp()).getTime()) /
+      (Date.now() - (license.purchaseDate || licenseCreatedAt).getTime()) /
         (1000 * 60 * 60 * 24)
     );
+
+    const userPopulated: any = license.userId as any;
 
     const licenseDetail: LicenseDetail = {
       _id: license._id.toString(),
@@ -247,10 +255,10 @@ export async function GET(
       stripeSubscriptionId: license.stripeSubscriptionId,
       stripeCustomerId: license.stripeCustomerId,
       user: {
-        _id: license.userId._id.toString(),
-        email: license.userId.email,
-        name: license.userId.name,
-        phone: license.userId.phone,
+        _id: (userPopulated?._id as any)?.toString?.() || String(license.userId),
+        email: userPopulated?.email,
+        name: userPopulated?.name,
+        phone: userPopulated?.phone,
       },
       devices: devices.map((device) => ({
         _id: device._id.toString(),
@@ -281,7 +289,9 @@ export async function GET(
         success: false,
         message: "Failed to fetch license details",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );

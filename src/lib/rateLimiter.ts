@@ -33,7 +33,7 @@ class RateLimiter {
 
   private defaultKeyGenerator(req: NextRequest): string {
     const forwarded = req.headers.get("x-forwarded-for");
-    const ip = forwarded ? forwarded.split(",")[0] : req.ip || "unknown";
+    const ip = forwarded ? forwarded.split(",")[0] : "unknown";
     return `${ip}:${req.nextUrl.pathname}`;
   }
 
@@ -100,7 +100,7 @@ export const adminAuthLimiter = new RateLimiter({
   maxRequests: 5, // 5 login attempts per 15 minutes
   keyGenerator: (req) => {
     const forwarded = req.headers.get("x-forwarded-for");
-    const ip = forwarded ? forwarded.split(",")[0] : req.ip || "unknown";
+    const ip = forwarded ? forwarded.split(",")[0] : "unknown";
     return `auth:${ip}`;
   },
 });

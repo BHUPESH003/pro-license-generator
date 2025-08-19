@@ -21,7 +21,7 @@ export class ApiErrorHandler {
     console.error("API Error:", error);
 
     // Handle known API errors
-    if (error instanceof ApiError || (error as any).code) {
+    if ((error as any)?.code) {
       const apiError = error as ApiError;
       return NextResponse.json(
         {

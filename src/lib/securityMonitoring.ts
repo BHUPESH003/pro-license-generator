@@ -62,9 +62,7 @@ class SecurityMonitor {
   private getClientIP(req: NextRequest): string {
     const forwarded = req.headers.get("x-forwarded-for");
     const realIP = req.headers.get("x-real-ip");
-    const ip = forwarded
-      ? forwarded.split(",")[0]
-      : realIP || req.ip || "unknown";
+    const ip = forwarded ? forwarded.split(",")[0] : realIP || "unknown";
     return ip.trim();
   }
 
@@ -424,7 +422,7 @@ export function withSecurityMonitoring(
       await recordUnusualActivity(
         req,
         token || "anonymous",
-        `Unexpected error: ${error.message}`
+        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
       );
       throw error;
     }

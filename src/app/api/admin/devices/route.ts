@@ -98,7 +98,7 @@ async function getDevicesHandler(request: NextRequest) {
         { email: { $regex: userEmailFilter, $options: "i" } },
         { _id: 1 }
       );
-      userIds = users.map((u) => u._id.toString());
+      userIds = users.map((u: any) => (u._id as any).toString());
       if (userIds.length === 0) {
         // No users found, return empty result
         return NextResponse.json({
@@ -123,7 +123,7 @@ async function getDevicesHandler(request: NextRequest) {
         { licenseKey: { $regex: licenseKeyFilter, $options: "i" } },
         { _id: 1 }
       );
-      licenseIds = licenses.map((l) => l._id.toString());
+      licenseIds = licenses.map((l: any) => (l._id as any).toString());
       if (licenseIds.length === 0) {
         return NextResponse.json({
           success: true,
@@ -160,7 +160,7 @@ async function getDevicesHandler(request: NextRequest) {
     const skip = (page - 1) * pageSize;
 
     // Execute aggregation pipeline for efficient data retrieval
-    const pipeline = [
+    const pipeline: any[] = [
       { $match: filterQuery },
       {
         $lookup: {
@@ -225,7 +225,7 @@ async function getDevicesHandler(request: NextRequest) {
     const devices = await Device.aggregate(dataPipeline);
 
     // Get telemetry stats for each device
-    const deviceIds = devices.map((d) => d._id);
+    const deviceIds = devices.map((d: any) => d._id);
     const telemetryStats = await TelemetryEvent.aggregate([
       {
         $match: {
@@ -244,7 +244,7 @@ async function getDevicesHandler(request: NextRequest) {
 
     // Create telemetry stats lookup
     const telemetryLookup = new Map();
-    telemetryStats.forEach((stat) => {
+    telemetryStats.forEach((stat: any) => {
       telemetryLookup.set(stat._id, {
         totalEvents: stat.totalEvents,
         lastEventDate: stat.lastEventDate,
@@ -253,7 +253,7 @@ async function getDevicesHandler(request: NextRequest) {
     });
 
     // Enhance devices with telemetry stats
-    const enhancedDevices = devices.map((device) => ({
+    const enhancedDevices = devices.map((device: any) => ({
       ...device,
       telemetryStats: telemetryLookup.get(device.deviceGuid) || {
         totalEvents: 0,
@@ -283,7 +283,9 @@ async function getDevicesHandler(request: NextRequest) {
         success: false,
         message: "Failed to fetch devices",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );
@@ -317,7 +319,7 @@ async function handleCsvExport(searchParams: URLSearchParams) {
         { email: { $regex: userEmailFilter, $options: "i" } },
         { _id: 1 }
       );
-      const userIds = users.map((u) => u._id.toString());
+      const userIds = users.map((u: any) => (u._id as any).toString());
       if (userIds.length === 0) {
         return new NextResponse(
           "Device Name,OS,Device GUID,Status,User Email,User Name,License Key,License Plan,Last Activity\n",
@@ -338,7 +340,7 @@ async function handleCsvExport(searchParams: URLSearchParams) {
         { licenseKey: { $regex: licenseKeyFilter, $options: "i" } },
         { _id: 1 }
       );
-      const licenseIds = licenses.map((l) => l._id.toString());
+      const licenseIds = licenses.map((l: any) => (l._id as any).toString());
       if (licenseIds.length === 0) {
         return new NextResponse(
           "Device Name,OS,Device GUID,Status,User Email,User Name,License Key,License Plan,Last Activity\n",
@@ -365,7 +367,7 @@ async function handleCsvExport(searchParams: URLSearchParams) {
     }
 
     // Aggregation pipeline for CSV export
-    const pipeline = [
+    const pipeline: any[] = [
       { $match: filterQuery },
       {
         $lookup: {
@@ -394,7 +396,7 @@ async function handleCsvExport(searchParams: URLSearchParams) {
       { $sort: { lastActivity: -1 } },
     ];
 
-    const devices = await Device.aggregate(pipeline);
+    const devices = await Device.aggregate(pipeline as any);
 
     // Generate CSV
     const csvHeaders =

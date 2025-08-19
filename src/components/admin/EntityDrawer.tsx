@@ -10,7 +10,7 @@ interface EntityDrawerProps {
   actions?: Array<{
     label: string;
     onClick: () => void;
-    variant: "primary" | "secondary" | "danger";
+    variant: "primary" | "secondary" | "error" | "accent";
     loading?: boolean;
   }>;
   width?: "sm" | "md" | "lg" | "xl";

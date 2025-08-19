@@ -21,9 +21,9 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
 
   const dispatch = useAppDispatch();
   const [localLoading, setLocalLoading] = useState(false);
-  const loadingTimeoutRef = useRef<NodeJS.Timeout>();
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>();
-  const startTimeRef = useRef<number>();
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const startTimeRef = useRef<number | undefined>(undefined);
 
   // Get global loading state from Redux
   const globalLoading = useAppSelector((state) => state.ui.loading.global);

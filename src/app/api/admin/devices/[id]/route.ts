@@ -120,11 +120,14 @@ export async function GET(
     const activityHistory: DeviceDetail["activityHistory"] = [];
 
     // Add device creation event
+    const deviceCreatedAt: Date = (
+      device._id as unknown as mongoose.Types.ObjectId
+    ).getTimestamp();
     activityHistory.push({
       _id: `device_created_${device._id}`,
       type: "device_created",
       description: `Device "${device.name}" was registered`,
-      timestamp: device._id.getTimestamp(),
+      timestamp: deviceCreatedAt,
       metadata: {
         deviceName: device.name,
         os: device.os,
@@ -133,7 +136,7 @@ export async function GET(
     });
 
     // Add audit log events
-    auditLogs.forEach((audit) => {
+    auditLogs.forEach((audit: any) => {
       let description = "";
       let type: DeviceDetail["activityHistory"][0]["type"] = "admin_action";
 
@@ -160,15 +163,15 @@ export async function GET(
       }
 
       activityHistory.push({
-        _id: audit._id.toString(),
+        _id: (audit._id as any).toString(),
         type,
         description,
         timestamp: audit.createdAt,
         actor: audit.actorUserId
           ? {
-              _id: audit.actorUserId._id.toString(),
-              email: audit.actorUserId.email,
-              name: audit.actorUserId.name,
+              _id: (audit.actorUserId._id as any).toString(),
+              email: (audit.actorUserId as any).email,
+              name: (audit.actorUserId as any).name,
             }
           : undefined,
         metadata: audit.payload,
@@ -224,7 +227,7 @@ export async function GET(
     const lastTelemetryEvent =
       telemetryEvents.length > 0 ? telemetryEvents[0].occurredAt : undefined;
     const daysActive = Math.floor(
-      (Date.now() - device._id.getTimestamp().getTime()) / (1000 * 60 * 60 * 24)
+      (Date.now() - deviceCreatedAt.getTime()) / (1000 * 60 * 60 * 24)
     );
     const averageEventsPerDay =
       daysActive > 0 ? totalTelemetryEvents / daysActive : 0;
@@ -243,6 +246,9 @@ export async function GET(
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
+    const userPopulated: any = device.userId as any;
+    const licensePopulated: any = device.licenseId as any;
+
     const deviceDetail: DeviceDetail = {
       _id: device._id.toString(),
       name: device.name,
@@ -251,22 +257,22 @@ export async function GET(
       status: device.status || "active",
       lastActivity: device.lastActivity,
       user: {
-        _id: device.userId._id.toString(),
-        email: device.userId.email,
-        name: device.userId.name,
-        phone: device.userId.phone,
+        _id: (userPopulated?._id as any)?.toString?.() || String(device.userId),
+        email: userPopulated?.email,
+        name: userPopulated?.name,
+        phone: userPopulated?.phone,
       },
       license: {
-        _id: device.licenseId._id.toString(),
-        licenseKey: device.licenseId.licenseKey,
-        status: device.licenseId.status,
-        plan: device.licenseId.plan,
-        mode: device.licenseId.mode,
-        planType: device.licenseId.planType,
-        expiryDate: device.licenseId.expiryDate,
+        _id: (licensePopulated?._id as any)?.toString?.() || String(device.licenseId),
+        licenseKey: licensePopulated?.licenseKey,
+        status: licensePopulated?.status,
+        plan: licensePopulated?.plan,
+        mode: licensePopulated?.mode,
+        planType: licensePopulated?.planType,
+        expiryDate: licensePopulated?.expiryDate,
       },
-      telemetryEvents: telemetryEvents.map((event) => ({
-        _id: event._id.toString(),
+      telemetryEvents: telemetryEvents.map((event: any) => ({
+        _id: (event._id as any).toString(),
         eventType: event.eventType,
         occurredAt: event.occurredAt,
         appVersion: event.appVersion,
@@ -294,7 +300,9 @@ export async function GET(
         success: false,
         message: "Failed to fetch device details",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );

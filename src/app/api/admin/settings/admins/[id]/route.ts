@@ -44,7 +44,7 @@ async function getAdminHandler(
       success: true,
       data: {
         ...adminUser,
-        id: adminUser._id.toString(),
+        id: (adminUser._id as any).toString(),
       },
     });
   } catch (error) {
@@ -139,12 +139,12 @@ async function updateAdminHandler(
 
     // Return updated admin without password
     const updatedAdmin = {
-      id: adminUser._id.toString(),
+      id: (adminUser._id as any).toString(),
       email: adminUser.email,
       name: adminUser.name,
       role: adminUser.role,
-      lastSeenAt: adminUser.lastSeenAt,
-      createdAt: adminUser.createdAt,
+      lastSeenAt: (adminUser as any).lastSeenAt,
+      createdAt: (adminUser as any).createdAt,
     };
 
     return NextResponse.json({
@@ -235,8 +235,10 @@ async function deleteAdminHandler(
 export const GET = withAdminAuth(getAdminHandler);
 export const PUT = withAuditLogging(
   withAdminAuth(updateAdminHandler),
-  async (req, admin, context) => {
-    const { id } = await context.params;
+  async (req, admin) => {
+    const url = new URL(req.url);
+    const segments = url.pathname.split("/");
+    const id = segments[segments.length - 1];
     const body = await req.json();
     return createCrudAuditData(
       "UPDATE",
@@ -248,8 +250,10 @@ export const PUT = withAuditLogging(
 );
 export const DELETE = withAuditLogging(
   withAdminAuth(deleteAdminHandler),
-  async (req, admin, context) => {
-    const { id } = await context.params;
+  async (req, admin) => {
+    const url = new URL(req.url);
+    const segments = url.pathname.split("/");
+    const id = segments[segments.length - 1];
     return createCrudAuditData("DELETE", "AdminUser", id);
   }
 );

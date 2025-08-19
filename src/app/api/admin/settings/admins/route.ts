@@ -139,12 +139,12 @@ async function createAdminHandler(request: NextRequest, admin: any) {
 
     // Return admin without password
     const adminResponse = {
-      id: newAdmin._id.toString(),
+      id: (newAdmin._id as any).toString(),
       email: newAdmin.email,
       name: newAdmin.name,
       role: newAdmin.role,
-      lastSeenAt: newAdmin.lastSeenAt,
-      createdAt: newAdmin.createdAt,
+      lastSeenAt: (newAdmin as any).lastSeenAt,
+      createdAt: (newAdmin as any).createdAt,
     };
 
     return NextResponse.json({

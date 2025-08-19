@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         { email: { $regex: userEmailFilter, $options: "i" } },
         { _id: 1 }
       );
-      userIds = users.map((u) => u._id.toString());
+      userIds = users.map((u: any) => (u._id as any).toString());
       if (userIds.length === 0) {
         // No users found, return empty result
         return NextResponse.json({
@@ -234,7 +234,9 @@ export async function GET(request: NextRequest) {
         success: false,
         message: "Failed to fetch licenses",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );
@@ -269,7 +271,7 @@ async function handleCsvExport(searchParams: URLSearchParams) {
         { email: { $regex: userEmailFilter, $options: "i" } },
         { _id: 1 }
       );
-      const userIds = users.map((u) => u._id.toString());
+      const userIds = users.map((u: any) => (u._id as any).toString());
       if (userIds.length === 0) {
         return new NextResponse(
           "License Key,Status,Plan,Mode,Plan Type,User Email,User Name,Device Count,Purchase Date,Expiry Date,Last Activity\n",
@@ -306,7 +308,7 @@ async function handleCsvExport(searchParams: URLSearchParams) {
     }
 
     // Aggregation pipeline for CSV export
-    const pipeline = [
+    const pipeline: any[] = [
       { $match: filterQuery },
       {
         $lookup: {
@@ -336,7 +338,7 @@ async function handleCsvExport(searchParams: URLSearchParams) {
       { $sort: { purchaseDate: -1 } },
     ];
 
-    const licenses = await License.aggregate(pipeline);
+    const licenses = await License.aggregate(pipeline as any);
 
     // Generate CSV
     const csvHeaders =

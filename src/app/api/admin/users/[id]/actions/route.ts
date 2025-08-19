@@ -61,10 +61,10 @@ async function userActionsHandler(
         return await handleAccountDeactivation(user, admin, actionData);
 
       case "activate_account":
-        return await handleAccountActivation(user, admin, actionData);
+        return await handleAccountActivation(user, admin.userId, actionData);
 
       case "delete_account":
-        return await handleAccountDeletion(user, admin, actionData);
+        return await handleAccountDeletion(user, admin.userId, actionData);
 
       default:
         return NextResponse.json(
@@ -214,7 +214,7 @@ async function handleAccountActivation(
 
   // Log the action
   await AdminAudit.create({
-    actorUserId: admin.userId,
+    actorUserId: adminUserId,
     action: "account_activated",
     entityType: "user",
     entityId: user._id.toString(),
@@ -254,7 +254,7 @@ async function handleAccountDeletion(
   }
 
   // Prevent self-deletion
-  if (admin.userId === user._id.toString()) {
+  if (adminUserId === user._id.toString()) {
     return NextResponse.json(
       {
         success: false,
@@ -292,7 +292,7 @@ async function handleAccountDeletion(
       await AdminAudit.create(
         [
           {
-            actorUserId: admin.userId,
+            actorUserId: adminUserId,
             action: "account_deleted",
             entityType: "user",
             entityId: user._id.toString(),

@@ -250,7 +250,9 @@ export async function POST(
         success: false,
         message: "Failed to perform license action",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );
@@ -354,7 +356,9 @@ export async function GET(
         success: false,
         message: "Failed to fetch license actions",
         error:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
+          process.env.NODE_ENV === "development"
+            ? (error instanceof Error ? error.message : String(error))
+            : undefined,
       },
       { status: 500 }
     );

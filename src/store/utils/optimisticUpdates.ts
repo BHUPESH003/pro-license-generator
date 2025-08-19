@@ -45,8 +45,8 @@ export function optimisticItemUpdate<T>(
 
   // Update the cache optimistically
   dispatch(
-    adminApi.util.updateQueryData(endpoint as any, itemId, (draft: T) => {
-      Object.assign(draft, updateData);
+    adminApi.util.updateQueryData(endpoint as any, itemId as any, (draft: any) => {
+      Object.assign(draft, updateData as any);
     })
   );
 }
@@ -148,7 +148,7 @@ export function invalidateRelatedQueries(tags: string[]) {
   const dispatch = store.dispatch;
 
   tags.forEach((tag) => {
-    dispatch(adminApi.util.invalidateTags([tag]));
+    dispatch(adminApi.util.invalidateTags([tag as any] as any));
   });
 }
 
@@ -158,7 +158,7 @@ export function invalidateRelatedQueries(tags: string[]) {
 export function prefetchRelatedData(endpoint: string, args: any) {
   const dispatch = store.dispatch;
 
-  dispatch(adminApi.util.prefetch(endpoint as any, args));
+  dispatch(adminApi.util.prefetch(endpoint as any, args, { force: true } as any));
 }
 
 /**
