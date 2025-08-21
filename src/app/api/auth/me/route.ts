@@ -17,14 +17,22 @@ export async function GET(request: NextRequest) {
 
   try {
     await dbConnect();
-    const user = await User.findById(userId).select("email _id");
+    const user = await User.findById(userId).select(
+      "email _id role lastSeenAt"
+    );
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Update lastSeenAt for admin users
+    if (user.role === "admin") {
+      user.lastSeenAt = new Date();
+      await user.save();
+    }
+
     // Don't send back sensitive data like passwords
-    const { ...userWithoutPassword } = user;
+    const { password, ...userWithoutPassword } = user.toObject();
 
     return NextResponse.json(userWithoutPassword);
   } catch (error) {

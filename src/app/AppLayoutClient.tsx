@@ -8,8 +8,11 @@ export default function AppLayoutClient({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  if (pathname.startsWith("/dashboard")) {
+
+  // Dashboard and admin routes use their own layouts
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) {
     return <>{children}</>;
   }
+
   return <MarketingLayout>{children}</MarketingLayout>;
 }

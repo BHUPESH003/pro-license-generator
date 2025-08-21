@@ -4,21 +4,26 @@ import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import { ILicense } from "./License"; // Import to type populate
 
+export interface UserAddress {
+  line1?: string;
+  line2?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+}
+
 export interface IUser extends Document {
   email: string;
   password?: string;
   license?: ILicense | mongoose.Types.ObjectId; // Reference to License
   name?: string;
   phone?: string;
-  address?: {
-    line1?: string;
-    line2?: string;
-    city?: string;
-    state?: string;
-    postal_code?: string;
-    country?: string;
-  };
+  address?: UserAddress;
   stripeCustomerId?: string;
+  // New admin fields
+  role?: "admin";
+  lastSeenAt?: Date;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -36,7 +41,16 @@ const UserSchema = new Schema<IUser>({
     country: { type: String },
   },
   stripeCustomerId: { type: String },
+  // Admin fields
+  role: { type: String, enum: ["admin"], required: false },
+  lastSeenAt: { type: Date },
 });
+
+// Add indexes for admin query optimization
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ role: 1 });
+UserSchema.index({ lastSeenAt: -1 });
+UserSchema.index({ stripeCustomerId: 1 });
 
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
@@ -51,7 +65,9 @@ UserSchema.pre("save", async function (next) {
 
 // In dev, Next.js HMR can retain an older compiled model without new fields.
 // If a model already exists, ensure its schema has the new optional fields.
-const ExistingUserModel = (mongoose.models.User as mongoose.Model<IUser> | undefined);
+const ExistingUserModel = mongoose.models.User as
+  | mongoose.Model<IUser>
+  | undefined;
 if (ExistingUserModel) {
   const paths = ExistingUserModel.schema.paths as any;
   if (!paths.name) ExistingUserModel.schema.add({ name: { type: String } });
@@ -68,7 +84,14 @@ if (ExistingUserModel) {
       },
     });
   }
-  if (!paths.stripeCustomerId) ExistingUserModel.schema.add({ stripeCustomerId: { type: String } });
+  if (!paths.stripeCustomerId)
+    ExistingUserModel.schema.add({ stripeCustomerId: { type: String } });
+  if (!paths.role)
+    ExistingUserModel.schema.add({
+      role: { type: String, enum: ["admin"], required: false },
+    });
+  if (!paths.lastSeenAt)
+    ExistingUserModel.schema.add({ lastSeenAt: { type: Date } });
 }
 
 export default ExistingUserModel || mongoose.model<IUser>("User", UserSchema);

@@ -54,9 +54,11 @@ export async function POST(req: NextRequest) {
     const existingDevice = await Device.findOne({ deviceGuid });
     if (existingDevice) {
       // Ensure it's tied to the same user/license
+      const existingLicenseId = (existingDevice.licenseId as any)?.toString?.() || String(existingDevice.licenseId);
+      const currentLicenseId = (license._id as any)?.toString?.() || String(license._id);
       if (
         existingDevice.userId.toString() !== license.userId.toString() ||
-        existingDevice.licenseId.toString() !== license._id.toString()
+        existingLicenseId !== currentLicenseId
       ) {
         return NextResponse.json(
           { error: "Device GUID already registered to another license/user" },

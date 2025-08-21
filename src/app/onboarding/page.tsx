@@ -1,11 +1,11 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import apiClient from "@/lib/axios";
 
-export default function OnboardingPage() {
+function OnboardingInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
   const router = useRouter();
@@ -75,6 +75,14 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<div className="max-w-xl mx-auto mt-16 p-8">Loading...</div>}>
+      <OnboardingInner />
+    </Suspense>
   );
 }
 
