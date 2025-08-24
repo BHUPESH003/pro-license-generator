@@ -27,7 +27,12 @@ function OnboardingInner() {
     try {
       setSaving(true);
       setError("");
-      await apiClient.post("/api/user/profile", { token, name, phone, address });
+      await apiClient.post("/api/user/profile", {
+        token,
+        name,
+        phone,
+        address,
+      });
       router.push("/login");
     } catch (e: any) {
       setError(e?.response?.data?.error || "Failed to save profile");
@@ -44,24 +49,57 @@ function OnboardingInner() {
         Optional, but helps us prefill billing details.
       </p>
       <div className="flex flex-col gap-3">
-        <Input placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} />
-        <Input placeholder="Mobile number" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <Input placeholder="Address line 1" value={address.line1} onChange={(e) => setAddress({ ...address, line1: e.target.value })} />
-        <Input placeholder="Address line 2" value={address.line2} onChange={(e) => setAddress({ ...address, line2: e.target.value })} />
+        <Input
+          placeholder="Full name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Input
+          placeholder="Mobile number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <Input
+          placeholder="Address line 1"
+          value={address.line1}
+          onChange={(e) => setAddress({ ...address, line1: e.target.value })}
+        />
+        <Input
+          placeholder="Address line 2"
+          value={address.line2}
+          onChange={(e) => setAddress({ ...address, line2: e.target.value })}
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Input placeholder="City" value={address.city} onChange={(e) => setAddress({ ...address, city: e.target.value })} />
-          <Input placeholder="State" value={address.state} onChange={(e) => setAddress({ ...address, state: e.target.value })} />
+          <Input
+            placeholder="City"
+            value={address.city}
+            onChange={(e) => setAddress({ ...address, city: e.target.value })}
+          />
+          <Input
+            placeholder="State"
+            value={address.state}
+            onChange={(e) => setAddress({ ...address, state: e.target.value })}
+          />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Input placeholder="Postal code" value={address.postal_code} onChange={(e) => setAddress({ ...address, postal_code: e.target.value })} />
-          <Input placeholder="Country (ISO code e.g. IN)" value={address.country} onChange={(e) => setAddress({ ...address, country: e.target.value })} />
+          <Input
+            placeholder="Postal code"
+            value={address.postal_code}
+            onChange={(e) =>
+              setAddress({ ...address, postal_code: e.target.value })
+            }
+          />
+          <Input
+            placeholder="Country (ISO code e.g. IN)"
+            value={address.country}
+            onChange={(e) =>
+              setAddress({ ...address, country: e.target.value })
+            }
+          />
         </div>
         {error && <div className="text-[var(--error)] text-sm">{error}</div>}
         <div className="flex items-center justify-between mt-4">
-          <Button
-            variant="secondary"
-            onClick={() => router.push("/login")}
-          >
+          <Button variant="secondary" onClick={() => router.push("/login")}>
             Skip for now
           </Button>
           <Button
@@ -80,10 +118,10 @@ function OnboardingInner() {
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div className="max-w-xl mx-auto mt-16 p-8">Loading...</div>}>
+    <Suspense
+      fallback={<div className="max-w-xl mx-auto mt-16 p-8">Loading...</div>}
+    >
       <OnboardingInner />
     </Suspense>
   );
 }
-
-

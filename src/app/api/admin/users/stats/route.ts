@@ -72,7 +72,7 @@ async function getUserStatsHandler(request: NextRequest) {
               },
             },
             {
-              $sort: { _id: 1 as 1 },
+              $sort: { _id: 1 as const },
             },
             {
               $project: {
@@ -116,7 +116,7 @@ async function getUserStatsHandler(request: NextRequest) {
         message: "Failed to fetch user statistics",
         code: "OPERATION_FAILED",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

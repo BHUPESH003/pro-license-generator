@@ -15,9 +15,13 @@ import {
   AlertCircle,
 } from "lucide-react";
 import AdminProtection from "@/components/admin/AdminProtection";
-import { DataTable } from "@/components/admin/DataTable";
 import LicenseDetailDrawer from "@/components/admin/LicenseDetailDrawer";
-import { FilterConfig, ActionConfig } from "@/components/admin/types";
+import { CustomDataTable } from "@/components/ui/CustomDataTable";
+import {
+  FilterConfig,
+  ActionConfig,
+  DataTableColumn,
+} from "@/components/ui/CustomDataTable.types";
 import { Button } from "@/components/ui/Button";
 import apiClient from "@/lib/axios";
 
@@ -47,22 +51,22 @@ export default function LicensesPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   // DataTable columns configuration
-  const columns = [
+  const columns: DataTableColumn[] = [
     {
       field: "licenseKey",
       headerName: "License Key",
       width: 200,
-      pinned: "left" as const,
-      cellRenderer: (params: any) => (
-        <div className="font-mono text-sm">{params.value}</div>
+      pinned: "left",
+      cellRenderer: (value: any) => (
+        <div className="font-mono text-sm">{value}</div>
       ),
     },
     {
       field: "status",
       headerName: "Status",
       width: 120,
-      cellRenderer: (params: any) => {
-        const status = params.value;
+      cellRenderer: (value: any) => {
+        const status = value;
         const isActive = status === "active";
         return (
           <div
@@ -103,22 +107,22 @@ export default function LicensesPage() {
       field: "user.email",
       headerName: "User Email",
       width: 200,
-      valueGetter: (params: any) => params.data.user?.email,
+      valueGetter: (row: License) => row.user?.email,
     },
     {
       field: "user.name",
       headerName: "User Name",
       width: 150,
-      valueGetter: (params: any) => params.data.user?.name || "N/A",
+      valueGetter: (row: License) => row.user?.name || "N/A",
     },
     {
       field: "deviceCount",
       headerName: "Devices",
       width: 100,
-      cellRenderer: (params: any) => (
+      cellRenderer: (value: any) => (
         <div className="text-center">
           <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded-full text-xs font-medium">
-            {params.value}
+            {value}
           </span>
         </div>
       ),
@@ -127,15 +131,14 @@ export default function LicensesPage() {
       field: "purchaseDate",
       headerName: "Purchase Date",
       width: 150,
-      cellRenderer: (params: any) =>
-        new Date(params.value).toLocaleDateString(),
+      cellRenderer: (value: any) => new Date(value).toLocaleDateString(),
     },
     {
       field: "expiryDate",
       headerName: "Expiry Date",
       width: 150,
-      cellRenderer: (params: any) => {
-        const date = new Date(params.value);
+      cellRenderer: (value: any) => {
+        const date = new Date(value);
         const isExpired = date < new Date();
         const isExpiringSoon =
           date < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -146,8 +149,8 @@ export default function LicensesPage() {
               isExpired
                 ? "text-red-600 dark:text-red-400"
                 : isExpiringSoon
-                ? "text-orange-600 dark:text-orange-400"
-                : "text-slate-900 dark:text-white"
+                  ? "text-orange-600 dark:text-orange-400"
+                  : "text-slate-900 dark:text-slate-100"
             }`}
           >
             {date.toLocaleDateString()}
@@ -163,8 +166,8 @@ export default function LicensesPage() {
       field: "lastActivity",
       headerName: "Last Activity",
       width: 150,
-      cellRenderer: (params: any) =>
-        params.value ? new Date(params.value).toLocaleDateString() : "Never",
+      cellRenderer: (value: any) =>
+        value ? new Date(value).toLocaleDateString() : "Never",
     },
   ];
 
@@ -343,7 +346,7 @@ export default function LicensesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <DataTable<License>
+          <CustomDataTable
             key={refreshKey}
             columns={columns}
             endpoint="/api/admin/licenses"

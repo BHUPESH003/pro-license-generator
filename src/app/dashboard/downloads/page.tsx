@@ -68,8 +68,8 @@ export default function DownloadsPage() {
         Download Software
       </h1>
       <p className="text-xl text-slate-600 dark:text-slate-300 mb-10 leading-relaxed">
-        Get the latest version of ProApp for your operating system with enhanced
-        security features and improved performance.
+        Get the latest version of MyCleanOne for your operating system with
+        enhanced security features and improved performance.
       </p>
       {loading ? (
         <div className="text-center text-slate-600 dark:text-slate-300 py-12">

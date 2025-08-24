@@ -7,18 +7,20 @@ import TelemetryEvent from "@/models/TelemetryEvent";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      licenseKey,
-      deviceGuid,
-      sessionId,
-      appVersion,
-      os,
-      events,
-    } = body || {};
+    const { licenseKey, deviceGuid, sessionId, appVersion, os, events } =
+      body || {};
 
-    if (!licenseKey || !deviceGuid || !Array.isArray(events) || events.length === 0) {
+    if (
+      !licenseKey ||
+      !deviceGuid ||
+      !Array.isArray(events) ||
+      events.length === 0
+    ) {
       return NextResponse.json(
-        { error: "licenseKey, deviceGuid and non-empty events array are required" },
+        {
+          error:
+            "licenseKey, deviceGuid and non-empty events array are required",
+        },
         { status: 400 }
       );
     }
@@ -27,7 +29,10 @@ export async function POST(req: NextRequest) {
 
     const license = await License.findOne({ licenseKey }).select("_id userId");
     if (!license) {
-      return NextResponse.json({ error: "Invalid license key" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Invalid license key" },
+        { status: 404 }
+      );
     }
 
     // Basic per-request cap to avoid abuse
@@ -69,7 +74,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, acceptedCount: accepted });
   } catch (e) {
-    return NextResponse.json({ error: "Failed to record events" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to record events" },
+      { status: 500 }
+    );
   }
 }
 
@@ -80,7 +88,10 @@ export async function GET(req: NextRequest) {
     const licenseKey = searchParams.get("licenseKey");
     const deviceGuid = searchParams.get("deviceGuid");
     const eventType = searchParams.get("eventType") || undefined;
-    const limit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 200);
+    const limit = Math.min(
+      parseInt(searchParams.get("limit") || "50", 10),
+      200
+    );
     const since = searchParams.get("since");
 
     if (!licenseKey || !deviceGuid) {
@@ -93,7 +104,10 @@ export async function GET(req: NextRequest) {
     await dbConnect();
     const license = await License.findOne({ licenseKey }).select("_id userId");
     if (!license) {
-      return NextResponse.json({ error: "Invalid license key" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Invalid license key" },
+        { status: 404 }
+      );
     }
 
     const query: any = { licenseId: license._id, deviceGuid };
@@ -107,8 +121,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, events });
   } catch (e) {
-    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch events" },
+      { status: 500 }
+    );
   }
 }
-
-

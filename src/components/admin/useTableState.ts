@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TableState } from "./types";
 import { parseTableStateFromUrl, tableStateToUrlParams } from "./utils";
@@ -19,6 +19,9 @@ export function useTableState(options: UseTableStateOptions = {}) {
   const [tableState, setTableState] = useState<TableState>(() =>
     parseTableStateFromUrl(searchParams, defaultPageSize, defaultSort)
   );
+
+  // Separate state for immediate API calls
+  const [pendingFilters, setPendingFilters] = useState<Record<string, any>>({});
 
   // Update URL when state changes
   const updateUrl = useCallback(
@@ -60,9 +63,25 @@ export function useTableState(options: UseTableStateOptions = {}) {
     [tableState, updateUrl]
   );
 
-  // Update filters and reset to first page
+  // Get current filters for API calls (uses pending if available)
+  const getCurrentFilters = useCallback(() => {
+    return Object.keys(pendingFilters).length > 0
+      ? pendingFilters
+      : tableState.filters;
+  }, [pendingFilters, tableState.filters]);
+
+  // Clear pending filters after successful API call
+  const clearPendingFilters = useCallback(() => {
+    setPendingFilters({});
+  }, []);
+
+  // Update filters and reset to first page with immediate effect
   const updateFilters = useCallback(
     (filters: Record<string, any>) => {
+      // Update pending filters immediately for API calls
+      setPendingFilters(filters);
+
+      // Update table state and URL
       resetToFirstPage({ filters });
     },
     [resetToFirstPage]
@@ -90,6 +109,7 @@ export function useTableState(options: UseTableStateOptions = {}) {
 
   // Clear all filters
   const clearFilters = useCallback(() => {
+    setPendingFilters({});
     resetToFirstPage({ filters: {} });
   }, [resetToFirstPage]);
 
@@ -101,10 +121,14 @@ export function useTableState(options: UseTableStateOptions = {}) {
       defaultSort
     );
     setTableState(newState);
+    // Clear pending filters when URL changes (browser navigation)
+    setPendingFilters({});
   }, [searchParams, defaultPageSize, defaultSort]);
 
   return {
     tableState,
+    getCurrentFilters,
+    clearPendingFilters,
     updateTableState,
     updateFilters,
     updateSort,

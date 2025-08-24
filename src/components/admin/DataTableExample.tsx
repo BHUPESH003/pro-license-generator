@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { DataTable } from "./DataTable";
-import { FilterConfig, ActionConfig, DataTableColumn } from "./types";
+import { CustomDataTable } from "../ui/CustomDataTable";
+import { FilterConfig, ActionConfig, DataTableColumn } from "../ui/CustomDataTable.types";
 import { createDateColumn, createStatusColumn, formatTableDate } from "./utils";
 
 // Example data interface
@@ -24,21 +24,18 @@ export function DataTableExample() {
       headerName: "Email",
       width: 200,
       sortable: true,
-      filter: true,
     },
     {
       field: "name",
       headerName: "Name",
       width: 150,
       sortable: true,
-      filter: true,
     },
     {
       field: "role",
       headerName: "Role",
       width: 120,
       sortable: true,
-      filter: true,
     },
     createStatusColumn("status", "Status", 120),
     createDateColumn("lastSeenAt", "Last Seen", 150),
@@ -113,7 +110,7 @@ export function DataTableExample() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">DataTable Example</h1>
 
-      <DataTable<ExampleUser>
+      <CustomDataTable
         columns={columns}
         endpoint="/api/admin/users"
         filters={filters}

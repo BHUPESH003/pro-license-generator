@@ -130,8 +130,8 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   const isLoading = global
     ? globalLoading
     : operationKey
-    ? operationLoading
-    : localLoading;
+      ? operationLoading
+      : localLoading;
 
   return {
     isLoading,

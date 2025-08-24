@@ -111,10 +111,9 @@ export default function AuditRetentionDialog({
     setCleanupResult(null);
 
     try {
-      const { data } = await apiClient.delete(
-        `/api/admin/audit/retention`,
-        { params: { dryRun: true, retentionDays: policy.retentionDays } }
-      );
+      const { data } = await apiClient.delete(`/api/admin/audit/retention`, {
+        params: { dryRun: true, retentionDays: policy.retentionDays },
+      });
       setCleanupResult(data.data);
     } catch (err) {
       setError(
@@ -130,10 +129,9 @@ export default function AuditRetentionDialog({
     setError(null);
 
     try {
-      const { data } = await apiClient.delete(
-        `/api/admin/audit/retention`,
-        { params: { retentionDays: policy.retentionDays } }
-      );
+      const { data } = await apiClient.delete(`/api/admin/audit/retention`, {
+        params: { retentionDays: policy.retentionDays },
+      });
       setCleanupResult(data.data);
       setSuccess(
         `Successfully deleted ${data.data.deletedCount} audit records`

@@ -224,8 +224,8 @@ export function validateField(
       typeof value === "string"
         ? value.length
         : Array.isArray(value)
-        ? value.length
-        : 0;
+          ? value.length
+          : 0;
     if (length < rule.minLength) {
       throw new ValidationError(
         `${fieldName} must be at least ${rule.minLength} characters long`,
@@ -240,8 +240,8 @@ export function validateField(
       typeof value === "string"
         ? value.length
         : Array.isArray(value)
-        ? value.length
-        : 0;
+          ? value.length
+          : 0;
     if (length > rule.maxLength) {
       throw new ValidationError(
         `${fieldName} must be at most ${rule.maxLength} characters long`,

@@ -319,8 +319,8 @@ export async function GET(request: NextRequest) {
         previousCount > 0
           ? ((currentCount - previousCount) / previousCount) * 100
           : currentCount > 0
-          ? 100
-          : 0;
+            ? 100
+            : 0;
       return { currentCount, growth };
     };
 
@@ -410,7 +410,9 @@ export async function GET(request: NextRequest) {
         message: "Failed to fetch dashboard metrics",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }

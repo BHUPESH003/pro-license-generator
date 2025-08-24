@@ -176,10 +176,16 @@ export async function POST(
         // Safely determine the bound license key regardless of populate state
         let boundLicenseKey: string | undefined;
         const licenseRef: any = device.licenseId as any;
-        if (licenseRef && typeof licenseRef === "object" && "licenseKey" in licenseRef) {
+        if (
+          licenseRef &&
+          typeof licenseRef === "object" &&
+          "licenseKey" in licenseRef
+        ) {
           boundLicenseKey = licenseRef.licenseKey as string;
         } else if (device.licenseId) {
-          const lic = await License.findById(device.licenseId).select("licenseKey");
+          const lic = await License.findById(device.licenseId).select(
+            "licenseKey"
+          );
           boundLicenseKey = lic?.licenseKey;
         }
 
@@ -278,7 +284,9 @@ export async function POST(
         message: "Failed to perform device action",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }
@@ -388,7 +396,9 @@ export async function GET(
         message: "Failed to fetch device actions",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }

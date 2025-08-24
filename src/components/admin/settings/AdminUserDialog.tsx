@@ -321,8 +321,8 @@ export default function AdminUserDialog({
                   {loading
                     ? "Saving..."
                     : isEditing
-                    ? "Update Admin"
-                    : "Create Admin"}
+                      ? "Update Admin"
+                      : "Create Admin"}
                 </Button>
               </div>
             </form>

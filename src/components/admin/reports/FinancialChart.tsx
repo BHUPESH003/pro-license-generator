@@ -159,8 +159,8 @@ export function FinancialChart({
     chartType === "area"
       ? AreaChart
       : chartType === "bar"
-      ? BarChart
-      : LineChart;
+        ? BarChart
+        : LineChart;
 
   return (
     <div className="space-y-4">

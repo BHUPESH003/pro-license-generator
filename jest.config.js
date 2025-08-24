@@ -1,17 +1,15 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: "node",
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: { isolatedModules: true } }],
+    "^.+\\.(ts|tsx)$": ["ts-jest", { tsconfig: { isolatedModules: true } }],
   },
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
-  transformIgnorePatterns: [
-    '/node_modules/(?!(jose)/)',
-  ],
+  transformIgnorePatterns: ["/node_modules/(?!(jose)/)"],
   setupFilesAfterEnv: [],
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  testPathIgnorePatterns: ["/node_modules/", "/.next/"],
 };
 
 const nextJest = require("next/jest");

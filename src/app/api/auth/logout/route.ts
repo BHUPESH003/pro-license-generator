@@ -8,7 +8,11 @@ export async function POST() {
     );
 
     // Clear the refresh token cookie
-    response.cookies.set("refreshToken", "", { httpOnly: true, maxAge: 0, path: "/" });
+    response.cookies.set("refreshToken", "", {
+      httpOnly: true,
+      maxAge: 0,
+      path: "/",
+    });
 
     return response;
   } catch (error) {

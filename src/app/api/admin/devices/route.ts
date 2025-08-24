@@ -284,7 +284,9 @@ async function getDevicesHandler(request: NextRequest) {
         message: "Failed to fetch devices",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }

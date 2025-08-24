@@ -186,7 +186,10 @@ export default function LicensesPage() {
                     </span>
                   </span>
                   <span>
-                    Expires: {lic.expiryDate ? new Date(lic.expiryDate).toLocaleDateString() : "-"}
+                    Expires:{" "}
+                    {lic.expiryDate
+                      ? new Date(lic.expiryDate).toLocaleDateString()
+                      : "-"}
                   </span>
                   <span>
                     Purchased:{" "}
@@ -209,7 +212,10 @@ export default function LicensesPage() {
                     className="px-2 py-1 rounded border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)]"
                     value={renewPlan[lic._id] || "monthly"}
                     onChange={(e) =>
-                      setRenewPlan((prev) => ({ ...prev, [lic._id]: e.target.value }))
+                      setRenewPlan((prev) => ({
+                        ...prev,
+                        [lic._id]: e.target.value,
+                      }))
                     }
                   >
                     <option value="monthly">Monthly</option>
@@ -221,7 +227,11 @@ export default function LicensesPage() {
                     variant="accent"
                     className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-transparent"
                     onClick={() =>
-                      startCheckout(renewPlan[lic._id] || "monthly", "payment", lic._id)
+                      startCheckout(
+                        renewPlan[lic._id] || "monthly",
+                        "payment",
+                        lic._id
+                      )
                     }
                   >
                     Pay now
@@ -230,7 +240,11 @@ export default function LicensesPage() {
                     size="sm"
                     variant="secondary"
                     onClick={() =>
-                      startCheckout(renewPlan[lic._id] || "monthly", "subscription", lic._id)
+                      startCheckout(
+                        renewPlan[lic._id] || "monthly",
+                        "subscription",
+                        lic._id
+                      )
                     }
                   >
                     Setup mandate

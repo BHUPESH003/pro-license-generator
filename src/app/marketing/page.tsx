@@ -268,11 +268,7 @@ export default function MarketingLandingPage() {
               title: "Monthly",
               price: "$19",
               period: "/mo",
-              features: [
-                "Up to 10 devices",
-                "Email-based authentication",
-                "Basic dashboard",
-              ],
+              // features: ["Email-based authentication", "Basic dashboard"],
               border: "border-slate-200 dark:border-slate-700",
               popular: false,
             },
@@ -280,11 +276,7 @@ export default function MarketingLandingPage() {
               title: "Quarterly",
               price: "$49",
               period: "/qtr",
-              features: [
-                "Up to 10 devices",
-                "Email-based authentication",
-                "Basic dashboard",
-              ],
+              // features: ["Email-based authentication", "Basic dashboard"],
               border: "border-2 border-purple-500",
               popular: true,
             },
@@ -292,11 +284,7 @@ export default function MarketingLandingPage() {
               title: "Yearly",
               price: "$179",
               period: "/yr",
-              features: [
-                "Up to 10 devices",
-                "Email-based authentication",
-                "Basic dashboard",
-              ],
+              // features: ["Email-based authentication", "Basic dashboard"],
               border: "border-2 border-blue-500",
               popular: false,
             },
@@ -331,7 +319,7 @@ export default function MarketingLandingPage() {
                   {plan.period}
                 </span>
               </div>
-              <ul className="text-slate-600 dark:text-slate-300 text-base mb-8 space-y-3">
+              {/* <ul className="text-slate-600 dark:text-slate-300 text-base mb-8 space-y-3">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-center">
                     <svg
@@ -348,13 +336,13 @@ export default function MarketingLandingPage() {
                     {feature}
                   </li>
                 ))}
-              </ul>
+              </ul> */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full"
               >
-                <a href="/dashboard/downloads">
+                <a href="/dashboard/licenses">
                   <Button
                     size="lg"
                     className="w-full text-lg py-3 shadow-lg hover:shadow-xl transition-all duration-300"

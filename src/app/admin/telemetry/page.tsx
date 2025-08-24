@@ -15,10 +15,11 @@ import {
   Database,
 } from "lucide-react";
 import AdminProtection from "@/components/admin/AdminProtection";
-import { DataTable } from "@/components/admin/DataTable";
+import { CustomDataTable } from "@/components/ui/CustomDataTable";
+import { DataTableColumn } from "@/components/ui/CustomDataTable.types";
 import TelemetryDetailDrawer from "@/components/admin/TelemetryDetailDrawer";
 import TelemetryTrendChart from "@/components/admin/TelemetryTrendChart";
-import { FilterConfig, ActionConfig } from "@/components/admin/types";
+import { FilterConfig, ActionConfig } from "@/components/ui/CustomDataTable.types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import apiClient from "@/lib/axios";
@@ -123,7 +124,9 @@ export default function TelemetryPage() {
         responseType: "blob",
       });
 
-      const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob([response.data], {
+        type: "text/csv;charset=utf-8;",
+      });
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -209,14 +212,14 @@ export default function TelemetryPage() {
     []
   );
 
-  const columns = useMemo(
+  const columns: DataTableColumn[] = useMemo(
     () => [
       {
         field: "occurredAt",
         headerName: "Occurred At",
         width: 180,
-        valueFormatter: (params: any) => {
-          return new Date(params.value).toLocaleString();
+        valueFormatter: (value: any) => {
+          return new Date(value).toLocaleString();
         },
         sortable: true,
       },
@@ -236,14 +239,14 @@ export default function TelemetryPage() {
         field: "user.email",
         headerName: "User Email",
         width: 200,
-        valueGetter: (params: any) => params.data?.user?.email || "",
+        valueGetter: (row: TelemetryEvent) => row?.user?.email || "",
         sortable: true,
       },
       {
         field: "license.licenseKey",
         headerName: "License Key",
         width: 150,
-        valueGetter: (params: any) => params.data?.license?.licenseKey || "",
+        valueGetter: (row: TelemetryEvent) => row?.license?.licenseKey || "",
         sortable: true,
       },
       {
@@ -268,8 +271,8 @@ export default function TelemetryPage() {
         field: "metadata",
         headerName: "Metadata",
         width: 150,
-        cellRenderer: (params: any) => {
-          const metadata = params.value;
+        cellRenderer: (value: any, row: any) => {
+          const metadata = value;
           if (!metadata || typeof metadata !== "object")
             return <span className="text-gray-400 text-xs">No metadata</span>;
           const keys = Object.keys(metadata);
@@ -284,7 +287,7 @@ export default function TelemetryPage() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setSelectedEvent(params.data);
+                  setSelectedEvent(row);
                 }}
                 className="text-xs text-blue-600 hover:text-blue-800 underline"
               >
@@ -300,7 +303,7 @@ export default function TelemetryPage() {
 
   return (
     <AdminProtection>
-      <div className="space-y-6">
+      <div className="space-y-6 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -464,7 +467,7 @@ export default function TelemetryPage() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <Card className="p-6">
+            <Card className="p-6 admin-glass">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Telemetry Trends
@@ -477,7 +480,7 @@ export default function TelemetryPage() {
         )}
 
         {/* Data Table */}
-        <Card className="p-6">
+        <Card className="p-6 bg-transparent shadow-none border-0">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
@@ -494,18 +497,20 @@ export default function TelemetryPage() {
             </div>
           </div>
 
-          <DataTable<TelemetryEvent>
-            columns={columns}
-            endpoint="/api/admin/telemetry/events"
-            filters={filters}
-            actions={actions}
-            defaultSort={{ field: "occurredAt", direction: "desc" }}
-            exportEnabled={true}
-            pageSize={25}
-            onRowClick={handleRowClick}
-            onFiltersChange={setCurrentFilters}
-            className="h-[600px]"
-          />
+          <div className="max-h-[70vh] overflow-auto">
+            <CustomDataTable
+              columns={columns}
+              endpoint="/api/admin/telemetry/events"
+              filters={filters}
+              actions={actions}
+              defaultSort={{ field: "occurredAt", direction: "desc" }}
+              exportEnabled={true}
+              pageSize={25}
+              onRowClick={handleRowClick}
+              onFiltersChange={setCurrentFilters}
+              className="h-[600px]"
+            />
+          </div>
         </Card>
 
         {/* Detail Drawer */}

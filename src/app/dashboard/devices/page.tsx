@@ -48,20 +48,6 @@ export default function DevicesPage() {
     }
   };
 
-  const handleDeactivate = async (deviceId: string) => {
-    if (!window.confirm("Are you sure you want to deactivate this device?"))
-      return;
-    setActionLoading(deviceId);
-    try {
-      await apiClient.post(`/api/devices/${deviceId}/deactivate`);
-      setDevices((prev) => prev.filter((d) => d.deviceId !== deviceId));
-    } catch (err: any) {
-      alert(err.response?.data?.error || "Deactivation failed");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
   return (
     <div className="w-full max-w-4xl mx-auto py-8 px-2 sm:px-0">
       <div className="flex items-center justify-between mb-6">
@@ -187,18 +173,6 @@ export default function DevicesPage() {
                       : "-"}
                   </span>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 mt-4 sm:mt-0">
-                <Button
-                  size="sm"
-                  variant="error"
-                  onClick={() => handleDeactivate(device.deviceId)}
-                  disabled={actionLoading === device.deviceId}
-                >
-                  {actionLoading === device.deviceId
-                    ? "Deactivating..."
-                    : "Deactivate"}
-                </Button>
               </div>
             </div>
           ))}

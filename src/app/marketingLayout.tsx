@@ -549,7 +549,7 @@ export default function MarketingLayout({
                       />
                     </svg>
                   </div>
-                  <span className="text-base">Mumbai, India</span>
+                  <span className="text-base">Gurugram, India</span>
                 </motion.div>
               </div>
             </motion.div>

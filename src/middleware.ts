@@ -124,7 +124,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (!sessionToken && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
+  if (
+    !sessionToken &&
+    (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))
+  ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

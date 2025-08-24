@@ -30,7 +30,8 @@ export const store = configureStore({
 
     // Guard against undefined util in certain test environments
     try {
-      const ignored = (adminApi as any)?.util?.getRunningQueriesThunk?.fulfilled?.type;
+      const ignored = (adminApi as any)?.util?.getRunningQueriesThunk?.fulfilled
+        ?.type;
       if (ignored) {
         // @ts-ignore adjust serializableCheck ignoredActions dynamically if available
         (md as any).options = {

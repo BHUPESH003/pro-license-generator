@@ -10,7 +10,10 @@ interface CSRFConfig {
 }
 
 export class CSRFError extends Error {
-  constructor(message: string, public code: string = "CSRF_TOKEN_INVALID") {
+  constructor(
+    message: string,
+    public code: string = "CSRF_TOKEN_INVALID"
+  ) {
     super(message);
     this.name = "CSRFError";
   }

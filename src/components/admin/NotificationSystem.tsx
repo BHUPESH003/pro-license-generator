@@ -129,10 +129,10 @@ function Notification({
               type === "success"
                 ? "bg-green-500"
                 : type === "error"
-                ? "bg-red-500"
-                : type === "warning"
-                ? "bg-yellow-500"
-                : "bg-blue-500"
+                  ? "bg-red-500"
+                  : type === "warning"
+                    ? "bg-yellow-500"
+                    : "bg-blue-500"
             }`}
             initial={{ width: "100%" }}
             animate={{ width: "0%" }}

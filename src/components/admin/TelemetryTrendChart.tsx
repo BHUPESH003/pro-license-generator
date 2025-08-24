@@ -283,8 +283,8 @@ export default function TelemetryTrendChart({
                     option.key === "7d"
                       ? "rounded-l-lg"
                       : option.key === "90d"
-                      ? "rounded-r-lg"
-                      : ""
+                        ? "rounded-r-lg"
+                        : ""
                   }`}
                 >
                   {option.label}
@@ -315,8 +315,8 @@ export default function TelemetryTrendChart({
                     option.key === "line"
                       ? "rounded-l-lg"
                       : option.key === "pie"
-                      ? "rounded-r-lg"
-                      : ""
+                        ? "rounded-r-lg"
+                        : ""
                   }`}
                 >
                   <Icon className="h-3 w-3" />

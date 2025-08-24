@@ -45,10 +45,8 @@ apiClient.interceptors.response.use(
         originalRequest.headers["Authorization"] = `Bearer ${data.accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // Refresh token failed, logout the user
+        // Refresh token failed, clear token but do not hard redirect off current admin page
         setAccessToken(null);
-        // Redirect to login page
-        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
