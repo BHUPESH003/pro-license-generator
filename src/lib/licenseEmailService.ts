@@ -20,10 +20,10 @@ export function buildLicenseEmail({
       action === "deactivated"
         ? `Your license(s) have been deactivated due to payment failure or subscription cancellation.`
         : action === "reactivated"
-        ? `Your license(s) have been reactivated. Thank you for your continued subscription!`
-        : action === "updated"
-        ? `Your license subscription has been updated.`
-        : `Thank you for your purchase! Here are your license keys:`,
+          ? `Your license(s) have been reactivated. Thank you for your continued subscription!`
+          : action === "updated"
+            ? `Your license subscription has been updated.`
+            : `Thank you for your purchase! Here are your license keys:`,
     licenseKeys,
     plan,
     expiryDate: expiryDate ? expiryDate.toISOString().slice(0, 10) : undefined,

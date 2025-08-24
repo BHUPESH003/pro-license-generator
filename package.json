@@ -6,7 +6,6 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -17,9 +16,13 @@
     "test:performance": "jest --testPathPattern=performance",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "create-admin": "node scripts/create-admin.js",
-    "verify-indexes": "node scripts/verify-indexes.js"
+    "verify-indexes": "node scripts/verify-indexes.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:fix": "next lint --fix"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.8.2",
     "@vercel/analytics": "^1.5.0",
     "ag-grid-community": "^34.1.1",
@@ -52,6 +55,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "9.34.0",
+    "eslint-config-next": "15.5.0",
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
     "tailwindcss": "^4",

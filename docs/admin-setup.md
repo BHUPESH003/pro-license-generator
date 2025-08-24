@@ -11,7 +11,6 @@ To create an admin user for accessing the admin panel:
    ```
 
 2. **Default admin credentials:**
-
    - Email: `admin@mycleanone.com`
    - Password: `admin123`
    - **Important:** Change this password after first login
@@ -64,7 +63,6 @@ To create an admin user for accessing the admin panel:
 ## Admin Authentication Flow
 
 1. **Login Process:**
-
    - User logs in with admin credentials
    - System verifies credentials and admin role
    - JWT tokens include role claim
@@ -72,7 +70,6 @@ To create an admin user for accessing the admin panel:
    - Refresh token expires in 7 days
 
 2. **Route Protection:**
-
    - `/admin/*` pages require admin role
    - `/api/admin/*` endpoints require admin role
    - Middleware automatically verifies role

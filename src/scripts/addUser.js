@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const dotenv = require("dotenv");
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
 
 dotenv.config();
 

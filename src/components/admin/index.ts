@@ -3,7 +3,7 @@ export { default as TrendChart } from "./TrendChart";
 export { default as DonutChart } from "./DonutChart";
 export { default as ConfirmDialog } from "./ConfirmDialog";
 export { default as EntityDrawer } from "./EntityDrawer";
-export { DataTable } from "./DataTable";
+// export { DataTable } from "./DataTable"; // Deprecated: replaced by ui/CustomDataTable
 export { useTableState } from "./useTableState";
 export { default as AdminProtection } from "./AdminProtection";
 export { EnhancedKPICard } from "./EnhancedKPICard";

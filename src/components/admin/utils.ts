@@ -195,13 +195,19 @@ export function getStatusColorClass(status: string): string {
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
-): (...args: Parameters<T>) => void {
+): ((...args: Parameters<T>) => void) & { cancel: () => void } {
   let timeout: NodeJS.Timeout;
 
-  return (...args: Parameters<T>) => {
+  const debouncedFunction = (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
+
+  debouncedFunction.cancel = () => {
+    clearTimeout(timeout);
+  };
+
+  return debouncedFunction;
 }
 
 /**

@@ -122,10 +122,10 @@ export default function ReportsPage() {
       timeRange === "7d"
         ? 7
         : timeRange === "30d"
-        ? 30
-        : timeRange === "90d"
-        ? 90
-        : 365;
+          ? 30
+          : timeRange === "90d"
+            ? 90
+            : 365;
     const from = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
     return {
@@ -148,7 +148,11 @@ export default function ReportsPage() {
             params: { from: dateRange.from, to: dateRange.to },
           }),
           apiClient.get(`/api/admin/reports/financial`, {
-            params: { from: dateRange.from, to: dateRange.to, includeStripe: true },
+            params: {
+              from: dateRange.from,
+              to: dateRange.to,
+              includeStripe: true,
+            },
           }),
         ]);
 
@@ -156,7 +160,10 @@ export default function ReportsPage() {
         setPlanMixData(planMixResponse.data.data);
       }
 
-      if (activeDevicesResponse.status >= 200 && activeDevicesResponse.status < 300) {
+      if (
+        activeDevicesResponse.status >= 200 &&
+        activeDevicesResponse.status < 300
+      ) {
         setActiveDevicesData(activeDevicesResponse.data.data);
       }
 
@@ -199,7 +206,9 @@ export default function ReportsPage() {
           responseType: "blob",
         });
 
-        const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob([response.data], {
+          type: "text/csv;charset=utf-8;",
+        });
         const downloadUrl = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = downloadUrl;

@@ -46,7 +46,7 @@ export function AdminThemeProvider({ children }: AdminThemeProviderProps) {
     }
   }, []);
 
-  // Apply theme to document
+  // Apply theme to document and inject CSS
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -54,6 +54,14 @@ export function AdminThemeProvider({ children }: AdminThemeProviderProps) {
       document.documentElement.classList.remove("dark");
     }
     localStorage.setItem("admin-theme", isDark ? "dark" : "light");
+
+    // Inject admin theme styles if not already present
+    if (!document.getElementById("admin-theme-styles")) {
+      const styleElement = document.createElement("style");
+      styleElement.id = "admin-theme-styles";
+      styleElement.textContent = adminThemeStyles;
+      document.head.appendChild(styleElement);
+    }
   }, [isDark]);
 
   // Save sidebar state
@@ -114,6 +122,74 @@ export const adminThemeStyles = `
     --admin-border: #334155;
     --admin-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
     --admin-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  }
+
+  /* AG Grid Dark Theme */
+  .ag-theme-alpine-dark {
+    --ag-background-color: var(--admin-surface);
+    --ag-header-background-color: var(--admin-background);
+    --ag-odd-row-background-color: var(--admin-surface);
+    --ag-row-hover-color: rgba(59, 130, 246, 0.1);
+    --ag-selected-row-background-color: rgba(59, 130, 246, 0.2);
+    --ag-border-color: var(--admin-border);
+    --ag-header-column-separator-color: var(--admin-border);
+    --ag-font-color: var(--admin-foreground);
+    --ag-secondary-font-color: var(--admin-muted);
+    --ag-input-background-color: var(--admin-surface);
+    --ag-input-border-color: var(--admin-border);
+    --ag-input-focus-border-color: var(--admin-primary);
+    --ag-checkbox-background-color: var(--admin-surface);
+    --ag-checkbox-border-color: var(--admin-border);
+    --ag-range-selection-background-color: rgba(59, 130, 246, 0.2);
+    --ag-cell-horizontal-border: var(--admin-border);
+    --ag-header-column-resize-handle-color: var(--admin-border);
+    --ag-disabled-foreground-color: var(--admin-muted);
+    --ag-chip-background-color: var(--admin-background);
+    --ag-loading-foreground-color: var(--admin-muted);
+  }
+
+  .dark-table-wrapper .ag-root-wrapper {
+    border-color: var(--admin-border);
+    background-color: var(--admin-surface);
+  }
+
+  .dark-table-wrapper .ag-header {
+    border-bottom-color: var(--admin-border);
+    background-color: var(--admin-background);
+  }
+
+  .dark-table-wrapper .ag-cell {
+    border-right-color: var(--admin-border);
+  }
+
+  .dark-table-wrapper .ag-row {
+    border-bottom-color: var(--admin-border);
+  }
+
+  .dark-table-wrapper .ag-row-hover {
+    background-color: rgba(59, 130, 246, 0.05);
+  }
+
+  .dark-table-wrapper .ag-header-cell {
+    color: var(--admin-foreground);
+  }
+
+  .dark-table-wrapper .ag-header-cell-text {
+    color: var(--admin-foreground);
+  }
+
+  .dark-table-wrapper .ag-cell {
+    color: var(--admin-foreground);
+  }
+
+  .dark-table-wrapper .ag-loading-center {
+    background-color: var(--admin-surface);
+    color: var(--admin-foreground);
+  }
+
+  .dark-table-wrapper .ag-overlay-no-rows-center {
+    background-color: var(--admin-surface);
+    color: var(--admin-muted);
   }
 
   .admin-scrollbar {

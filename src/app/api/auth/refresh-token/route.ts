@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const accessToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email, role: decoded.role }, // Include role in new token
       process.env.JWT_SECRET!,
-      { expiresIn: "15m" } // 15 minutes
+        { expiresIn: "12h" } // 12 hours
     );
 
     return NextResponse.json({ success: true, accessToken });

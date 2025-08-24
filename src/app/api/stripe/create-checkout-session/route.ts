@@ -3,7 +3,13 @@ import stripe from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   try {
-    const { plan, quantity, mode = "subscription", items, licenseId } = await req.json();
+    const {
+      plan,
+      quantity,
+      mode = "subscription",
+      items,
+      licenseId,
+    } = await req.json();
     const userEmail = req.headers.get("x-user-email");
     if (!userEmail) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -16,8 +22,10 @@ export async function POST(req: NextRequest) {
       if (mode === "payment") {
         // One-time price IDs
         priceId = process.env.STRIPE_MONTHLY_ONETIME_PRICE_ID;
-        if (p === "quarterly") priceId = process.env.STRIPE_QUARTERLY_ONETIME_PRICE_ID;
-        else if (p === "yearly") priceId = process.env.STRIPE_YEARLY_ONETIME_PRICE_ID;
+        if (p === "quarterly")
+          priceId = process.env.STRIPE_QUARTERLY_ONETIME_PRICE_ID;
+        else if (p === "yearly")
+          priceId = process.env.STRIPE_YEARLY_ONETIME_PRICE_ID;
       } else {
         // Subscription price IDs
         priceId = process.env.STRIPE_MONTHLY_PRICE_ID;
@@ -37,7 +45,9 @@ export async function POST(req: NextRequest) {
     if (Array.isArray(items) && items.length > 0) {
       // Validate: all items must share the same billing interval for subscriptions
       if (mode === "subscription") {
-        const plansSet = new Set((items || []).map((it: any) => (it?.plan || "monthly")));
+        const plansSet = new Set(
+          (items || []).map((it: any) => it?.plan || "monthly")
+        );
         if (plansSet.size > 1) {
           return NextResponse.json(
             {
@@ -54,22 +64,36 @@ export async function POST(req: NextRequest) {
     }
 
     if (lineItems.length === 0) {
-      return NextResponse.json({ error: "No line items provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No line items provided" },
+        { status: 400 }
+      );
     }
 
     // Validate price types match mode to avoid Stripe errors
     try {
-      const uniquePriceIds = Array.from(new Set(lineItems.map((li: any) => li.price)));
-      const prices = await Promise.all(uniquePriceIds.map((pid) => stripe.prices.retrieve(pid)));
+      const uniquePriceIds = Array.from(
+        new Set(lineItems.map((li: any) => li.price))
+      );
+      const prices = await Promise.all(
+        uniquePriceIds.map((pid) => stripe.prices.retrieve(pid))
+      );
       const anyRecurring = prices.some((p) => !!p.recurring);
       const anyOneTime = prices.some((p) => !p.recurring);
       if (mode === "payment" && anyRecurring) {
         return NextResponse.json(
           {
-            error: "One-time payment requires one-time prices. Check STRIPE_*_ONETIME_PRICE_ID envs.",
-            priceInfo: prices.map((p) => ({ id: p.id, recurring: p.recurring || null })),
+            error:
+              "One-time payment requires one-time prices. Check STRIPE_*_ONETIME_PRICE_ID envs.",
+            priceInfo: prices.map((p) => ({
+              id: p.id,
+              recurring: p.recurring || null,
+            })),
             mode,
-            plans: Array.isArray(items) && items.length > 0 ? items.map((i: any) => i.plan) : [plan],
+            plans:
+              Array.isArray(items) && items.length > 0
+                ? items.map((i: any) => i.plan)
+                : [plan],
           },
           { status: 400 }
         );
@@ -77,17 +101,27 @@ export async function POST(req: NextRequest) {
       if (mode === "subscription" && anyOneTime) {
         return NextResponse.json(
           {
-            error: "Subscription requires recurring prices. Check STRIPE_*_PRICE_ID envs.",
-            priceInfo: prices.map((p) => ({ id: p.id, recurring: p.recurring || null })),
+            error:
+              "Subscription requires recurring prices. Check STRIPE_*_PRICE_ID envs.",
+            priceInfo: prices.map((p) => ({
+              id: p.id,
+              recurring: p.recurring || null,
+            })),
             mode,
-            plans: Array.isArray(items) && items.length > 0 ? items.map((i: any) => i.plan) : [plan],
+            plans:
+              Array.isArray(items) && items.length > 0
+                ? items.map((i: any) => i.plan)
+                : [plan],
           },
           { status: 400 }
         );
       }
     } catch (e) {
       console.error("Price validation failed:", (e as any)?.message || e);
-      return NextResponse.json({ error: "Price validation failed." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Price validation failed." },
+        { status: 400 }
+      );
     }
 
     // Prefill if we have user details
@@ -111,17 +145,23 @@ export async function POST(req: NextRequest) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/licenses?canceled=1`,
       metadata: {
         mode,
-        plan: Array.isArray(items) && items.length > 0 ? (items[0]?.plan || plan || "monthly") : plan,
+        plan:
+          Array.isArray(items) && items.length > 0
+            ? items[0]?.plan || plan || "monthly"
+            : plan,
         licenseId: licenseId || "",
       },
     });
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Create checkout session error:", (error as any)?.message || error);
-    const message = (error as any)?.message || "Failed to create checkout session.";
+    console.error(
+      "Create checkout session error:",
+      (error as any)?.message || error
+    );
+    const message =
+      (error as any)?.message || "Failed to create checkout session.";
     const status = message.includes("Missing Stripe price ID") ? 400 : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }
-

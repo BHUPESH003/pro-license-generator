@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
 
     const license = await License.findOne({ licenseKey });
     if (!license) {
-      return NextResponse.json({ error: "Invalid license key" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Invalid license key" },
+        { status: 404 }
+      );
     }
 
     // Check expiry if present
@@ -28,9 +31,14 @@ export async function POST(req: NextRequest) {
     }
 
     // License must belong to a user
-    const user = await User.findById(license.userId).select("_id email name address phone");
+    const user = await User.findById(license.userId).select(
+      "_id email name address phone"
+    );
     if (!user) {
-      return NextResponse.json({ error: "Associated user not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Associated user not found" },
+        { status: 404 }
+      );
     }
 
     // Hard bind: if license already linked to a different device, block
@@ -43,7 +51,11 @@ export async function POST(req: NextRequest) {
 
     // If a device already exists for this license (regardless of GUID), ensure it matches
     const deviceByLicense = await Device.findOne({ licenseId: license._id });
-    if (deviceByLicense && deviceByLicense.deviceGuid && deviceByLicense.deviceGuid !== deviceGuid) {
+    if (
+      deviceByLicense &&
+      deviceByLicense.deviceGuid &&
+      deviceByLicense.deviceGuid !== deviceGuid
+    ) {
       return NextResponse.json(
         { error: "License already registered to a different device" },
         { status: 409 }
@@ -54,8 +66,11 @@ export async function POST(req: NextRequest) {
     const existingDevice = await Device.findOne({ deviceGuid });
     if (existingDevice) {
       // Ensure it's tied to the same user/license
-      const existingLicenseId = (existingDevice.licenseId as any)?.toString?.() || String(existingDevice.licenseId);
-      const currentLicenseId = (license._id as any)?.toString?.() || String(license._id);
+      const existingLicenseId =
+        (existingDevice.licenseId as any)?.toString?.() ||
+        String(existingDevice.licenseId);
+      const currentLicenseId =
+        (license._id as any)?.toString?.() || String(license._id);
       if (
         existingDevice.userId.toString() !== license.userId.toString() ||
         existingLicenseId !== currentLicenseId
@@ -138,8 +153,9 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
-    return NextResponse.json({ error: "Failed to register device" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to register device" },
+      { status: 500 }
+    );
   }
 }
-
-

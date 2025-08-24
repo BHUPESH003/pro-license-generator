@@ -17,10 +17,11 @@ import {
   Settings,
 } from "lucide-react";
 import AdminProtection from "@/components/admin/AdminProtection";
-import { DataTable } from "@/components/admin/DataTable";
+import { CustomDataTable } from "@/components/ui/CustomDataTable";
+import { DataTableColumn } from "@/components/ui/CustomDataTable.types";
 import AuditDetailDrawer from "@/components/admin/AuditDetailDrawer";
 import AuditRetentionDialog from "@/components/admin/AuditRetentionDialog";
-import { FilterConfig, ActionConfig } from "@/components/admin/types";
+import { FilterConfig, ActionConfig } from "@/components/ui/CustomDataTable.types";
 import { Button } from "@/components/ui/Button";
 
 interface AuditLog {
@@ -46,14 +47,14 @@ export default function AuditPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   // DataTable columns configuration
-  const columns = [
+  const columns: DataTableColumn[] = [
     {
       field: "createdAt",
       headerName: "Timestamp",
       width: 180,
-      pinned: "left" as const,
-      cellRenderer: (params: any) => {
-        const date = new Date(params.value);
+      pinned: "left",
+      cellRenderer: (value: any) => {
+        const date = new Date(value);
         return (
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-slate-400" />
@@ -73,18 +74,18 @@ export default function AuditPage() {
       field: "actorEmail",
       headerName: "Actor",
       width: 200,
-      cellRenderer: (params: any) => (
+      cellRenderer: (value: any, row: any) => (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-            {params.value?.charAt(0)?.toUpperCase() || "?"}
+            {value?.charAt(0)?.toUpperCase() || "?"}
           </div>
           <div>
             <div className="font-medium text-slate-900 dark:text-white">
-              {params.value || "Unknown"}
+              {value || "Unknown"}
             </div>
-            {params.data.actorName && (
+            {row.actorName && (
               <div className="text-xs text-slate-500 dark:text-slate-400">
-                {params.data.actorName}
+                {row.actorName}
               </div>
             )}
           </div>
@@ -95,8 +96,8 @@ export default function AuditPage() {
       field: "action",
       headerName: "Action",
       width: 180,
-      cellRenderer: (params: any) => {
-        const actionParts = params.value.split("_");
+      cellRenderer: (value: any) => {
+        const actionParts = value.split("_");
         const entityType = actionParts[0];
         const operation = actionParts.slice(1).join("_");
 
@@ -116,10 +117,10 @@ export default function AuditPage() {
       field: "entityType",
       headerName: "Entity",
       width: 120,
-      cellRenderer: (params: any) => (
+      cellRenderer: (value: any) => (
         <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
           <Database className="h-3 w-3" />
-          {params.value}
+          {value}
         </div>
       ),
     },
@@ -127,15 +128,13 @@ export default function AuditPage() {
       field: "entityId",
       headerName: "Entity ID",
       width: 150,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
+      cellRenderer: (value: any) => {
+        if (!value) {
           return <span className="text-slate-400 text-sm">-</span>;
         }
         return (
           <code className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">
-            {params.value.length > 15
-              ? `${params.value.substring(0, 15)}...`
-              : params.value}
+            {value.length > 15 ? `${value.substring(0, 15)}...` : value}
           </code>
         );
       },
@@ -144,8 +143,8 @@ export default function AuditPage() {
       field: "success",
       headerName: "Status",
       width: 100,
-      cellRenderer: (params: any) => {
-        const isSuccess = params.value;
+      cellRenderer: (value: any) => {
+        const isSuccess = value;
         return (
           <div
             className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
@@ -168,13 +167,13 @@ export default function AuditPage() {
       field: "ipAddress",
       headerName: "IP Address",
       width: 130,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
+      cellRenderer: (value: any) => {
+        if (!value) {
           return <span className="text-slate-400 text-sm">-</span>;
         }
         return (
           <code className="text-xs font-mono text-slate-600 dark:text-slate-400">
-            {params.value}
+            {value}
           </code>
         );
       },
@@ -333,7 +332,7 @@ export default function AuditPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <DataTable<AuditLog>
+          <CustomDataTable
             key={refreshKey}
             columns={columns}
             endpoint="/api/admin/audit"

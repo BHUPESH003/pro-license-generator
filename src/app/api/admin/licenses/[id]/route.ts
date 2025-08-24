@@ -255,7 +255,8 @@ export async function GET(
       stripeSubscriptionId: license.stripeSubscriptionId,
       stripeCustomerId: license.stripeCustomerId,
       user: {
-        _id: (userPopulated?._id as any)?.toString?.() || String(license.userId),
+        _id:
+          (userPopulated?._id as any)?.toString?.() || String(license.userId),
         email: userPopulated?.email,
         name: userPopulated?.name,
         phone: userPopulated?.phone,
@@ -290,7 +291,9 @@ export async function GET(
         message: "Failed to fetch license details",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }

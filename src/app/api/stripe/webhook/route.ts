@@ -55,7 +55,10 @@ export async function POST(req: NextRequest) {
     const subscriptionId = session.subscription;
     const customerId = session.customer;
     const plan = (session.metadata as any)?.plan || "monthly";
-    const mode = (session as any).mode || (session.metadata as any)?.mode || "subscription";
+    const mode =
+      (session as any).mode ||
+      (session.metadata as any)?.mode ||
+      "subscription";
     const licenseId = (session.metadata as any)?.licenseId;
     const quantity = (session.metadata as any)?.quantity
       ? parseInt((session.metadata as any).quantity)
@@ -65,9 +68,12 @@ export async function POST(req: NextRequest) {
       const user = await User.findOne({ email });
       if (user) {
         // Retrieve subscription to determine each item (plan and quantity)
-        const sub = await stripe.subscriptions.retrieve(subscriptionId as string, {
-          expand: ["items.data.price"],
-        });
+        const sub = await stripe.subscriptions.retrieve(
+          subscriptionId as string,
+          {
+            expand: ["items.data.price"],
+          }
+        );
 
         const allCreatedKeys: string[] = [];
         let lastExpiry: Date | undefined = undefined;
@@ -106,7 +112,10 @@ export async function POST(req: NextRequest) {
         // Extend expiry and mark active
         license.status = "active";
         const now = new Date();
-        const base = license.expiryDate && license.expiryDate > now ? license.expiryDate : now;
+        const base =
+          license.expiryDate && license.expiryDate > now
+            ? license.expiryDate
+            : now;
         // naive extend by plan
         if (plan === "yearly") {
           base.setFullYear(base.getFullYear() + 1);

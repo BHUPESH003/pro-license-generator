@@ -13,17 +13,20 @@ Modern web application to buy and manage licenses for the MyCleanOne cleaner app
 
 ## Quick Start
 
-1) Install dependencies
+1. Install dependencies
+
 ```bash
 npm install
 ```
 
-2) Configure environment variables (see list below)
+2. Configure environment variables (see list below)
 
-3) Run locally
+3. Run locally
+
 ```bash
 npm run dev
 ```
+
 Open `http://localhost:3000`.
 
 ## Environment Variables
@@ -84,6 +87,7 @@ Open `http://localhost:3000`.
 ### Checkout Session
 
 `POST /api/stripe/create-checkout-session`
+
 - Body: `{ plan, quantity, mode, licenseId? }`
 - mode:
   - `subscription` → uses recurring price IDs
@@ -93,6 +97,7 @@ Open `http://localhost:3000`.
 ### Webhook
 
 `POST /api/stripe/webhook`
+
 - `checkout.session.completed`:
   - subscription → create N licenses
   - one‑time with `licenseId` → renew that license
@@ -143,6 +148,7 @@ curl -X POST "$BASE_URL/api/telemetry/events" \
 ## Schemas
 
 ### `User`
+
 ```ts
 email: string
 password?: string (hashed)
@@ -154,6 +160,7 @@ stripeCustomerId?: string
 ```
 
 ### `License`
+
 ```ts
 licenseKey: string (unique)
 userId: ObjectId
@@ -167,6 +174,7 @@ plan?: string // monthly|quarterly|yearly
 ```
 
 ### `Device`
+
 ```ts
 name: string
 os: string
@@ -177,6 +185,7 @@ lastActivity: Date
 ```
 
 ### `TelemetryEvent`
+
 ```ts
 userId: ObjectId
 licenseId: ObjectId

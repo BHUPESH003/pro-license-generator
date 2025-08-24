@@ -661,11 +661,9 @@ export function buildAuditLogAggregationPipeline(
 
   // Add user lookup
   // Tests expect admin lookup naming; keep user lookup projection
-  builder
-    .lookup("users", "userId", "_id", "admin")
-    .addFields({
-      admin: { $arrayElemAt: ["$admin", 0] },
-    });
+  builder.lookup("users", "userId", "_id", "admin").addFields({
+    admin: { $arrayElemAt: ["$admin", 0] },
+  });
 
   // Add sorting
   if (options.sortBy) {

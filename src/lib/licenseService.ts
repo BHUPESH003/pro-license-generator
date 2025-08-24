@@ -29,8 +29,8 @@ export async function createLicenses(
     plan === "yearly"
       ? addYears(new Date(), 1)
       : plan === "quarterly"
-      ? addMonths(new Date(), 3)
-      : addMonths(new Date(), 1);
+        ? addMonths(new Date(), 3)
+        : addMonths(new Date(), 1);
 
   const licenseKeys = [];
   const licensesToInsert = [];
@@ -61,8 +61,8 @@ export async function updateLicensesExpiry(licenses: ILicense[]) {
       lic.plan === "yearly"
         ? addYears(new Date(), 1)
         : lic.plan === "quarterly"
-        ? addMonths(new Date(), 3)
-        : addMonths(new Date(), 1);
+          ? addMonths(new Date(), 3)
+          : addMonths(new Date(), 1);
     await lic.save();
   }
 }

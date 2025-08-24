@@ -18,10 +18,14 @@ import {
   CreditCard,
 } from "lucide-react";
 import AdminProtection from "@/components/admin/AdminProtection";
-import { DataTable } from "@/components/admin/DataTable";
+import { CustomDataTable } from "@/components/ui/CustomDataTable";
 import UserDetailDrawer from "@/components/admin/UserDetailDrawer";
 import UserActionDialog from "@/components/admin/UserActionDialog";
-import { FilterConfig, ActionConfig } from "@/components/admin/types";
+import {
+  FilterConfig,
+  ActionConfig,
+  DataTableColumn,
+} from "@/components/ui/CustomDataTable.types";
 import { Button } from "@/components/ui/Button";
 
 interface User {
@@ -44,21 +48,21 @@ export default function UsersPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   // DataTable columns configuration
-  const columns = [
+  const columns: DataTableColumn[] = [
     {
       field: "email",
       headerName: "Email",
       width: 250,
-      pinned: "left" as const,
-      cellRenderer: (params: any) => (
+      pinned: "left",
+      cellRenderer: (value: any, row: any) => (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-            {params.value.charAt(0).toUpperCase()}
+            {value.charAt(0).toUpperCase()}
           </div>
           <div>
-            <div className="font-medium">{params.value}</div>
-            {params.data.name && (
-              <div className="text-xs text-slate-500">{params.data.name}</div>
+            <div className="font-medium">{value}</div>
+            {row.name && (
+              <div className="text-xs text-slate-500">{row.name}</div>
             )}
           </div>
         </div>
@@ -68,8 +72,8 @@ export default function UsersPage() {
       field: "role",
       headerName: "Role",
       width: 120,
-      cellRenderer: (params: any) => {
-        const isAdmin = params.value === "admin";
+      cellRenderer: (value: any, row: any) => {
+        const isAdmin = value === "admin";
         return (
           <div
             className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
@@ -92,10 +96,10 @@ export default function UsersPage() {
       field: "licenseCount",
       headerName: "Licenses",
       width: 100,
-      cellRenderer: (params: any) => (
+      cellRenderer: (value: any, row: any) => (
         <div className="text-center">
           <span className="inline-flex items-center justify-center w-8 h-6 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 rounded text-xs font-medium">
-            {params.value}
+            {value}
           </span>
         </div>
       ),
@@ -104,10 +108,10 @@ export default function UsersPage() {
       field: "deviceCount",
       headerName: "Devices",
       width: 100,
-      cellRenderer: (params: any) => (
+      cellRenderer: (value: any, row: any) => (
         <div className="text-center">
           <span className="inline-flex items-center justify-center w-8 h-6 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded text-xs font-medium">
-            {params.value}
+            {value}
           </span>
         </div>
       ),
@@ -116,12 +120,12 @@ export default function UsersPage() {
       field: "lastSeenAt",
       headerName: "Last Seen",
       width: 150,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
+      cellRenderer: (value: any, row: any) => {
+        if (!value) {
           return <span className="text-slate-400 text-sm">Never</span>;
         }
 
-        const date = new Date(params.value);
+        const date = new Date(value);
         const isRecent = date > new Date(Date.now() - 24 * 60 * 60 * 1000); // Last 24 hours
 
         return (
@@ -150,8 +154,8 @@ export default function UsersPage() {
       field: "stripeCustomerId",
       headerName: "Stripe Customer",
       width: 150,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
+      cellRenderer: (value: any, row: any) => {
+        if (!value) {
           return <span className="text-slate-400 text-sm">No customer</span>;
         }
 
@@ -159,7 +163,7 @@ export default function UsersPage() {
           <div className="flex items-center gap-1">
             <CreditCard className="h-3 w-3 text-green-500" />
             <span className="font-mono text-xs text-slate-600 dark:text-slate-400">
-              {params.value.substring(0, 12)}...
+              {value.substring(0, 12)}...
             </span>
           </div>
         );
@@ -169,8 +173,8 @@ export default function UsersPage() {
       field: "createdAt",
       headerName: "Created",
       width: 120,
-      cellRenderer: (params: any) => {
-        const date = new Date(params.value);
+      cellRenderer: (value: any, row: any) => {
+        const date = new Date(value);
         return (
           <div className="text-slate-600 dark:text-slate-400">
             <div className="text-sm">{date.toLocaleDateString()}</div>
@@ -322,7 +326,7 @@ export default function UsersPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <DataTable<User>
+          <CustomDataTable
             key={refreshKey}
             columns={columns}
             endpoint="/api/admin/users"

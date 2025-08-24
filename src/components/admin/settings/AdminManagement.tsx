@@ -16,8 +16,9 @@ import {
   Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { DataTable } from "@/components/admin/DataTable";
-import { FilterConfig, ActionConfig } from "@/components/admin/types";
+import { CustomDataTable } from "@/components/ui/CustomDataTable";
+import { DataTableColumn } from "@/components/ui/CustomDataTable.types";
+import { FilterConfig, ActionConfig } from "@/components/ui/CustomDataTable.types";
 import AdminUserDialog from "./AdminUserDialog";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import apiClient from "@/lib/axios";
@@ -40,24 +41,24 @@ export default function AdminManagement() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // DataTable columns configuration
-  const columns = [
+  const columns: DataTableColumn[] = [
     {
       field: "email",
       headerName: "Email",
       width: 300,
-      pinned: "left" as const,
-      cellRenderer: (params: any) => (
+      pinned: "left",
+      cellRenderer: (value: any, row: any) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-            {params.value.charAt(0).toUpperCase()}
+            {value.charAt(0).toUpperCase()}
           </div>
           <div>
             <div className="font-medium text-slate-900 dark:text-white">
-              {params.value}
+              {value}
             </div>
-            {params.data.name && (
+            {row.name && (
               <div className="text-sm text-slate-500 dark:text-slate-400">
-                {params.data.name}
+                {row.name}
               </div>
             )}
           </div>
@@ -68,7 +69,7 @@ export default function AdminManagement() {
       field: "role",
       headerName: "Role",
       width: 120,
-      cellRenderer: (params: any) => (
+      cellRenderer: () => (
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
           <ShieldCheck className="h-4 w-4" />
           Admin
@@ -79,8 +80,8 @@ export default function AdminManagement() {
       field: "lastSeenAt",
       headerName: "Last Seen",
       width: 180,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
+      cellRenderer: (value: any) => {
+        if (!value) {
           return (
             <span className="text-slate-400 dark:text-slate-500 text-sm">
               Never
@@ -88,7 +89,7 @@ export default function AdminManagement() {
           );
         }
 
-        const date = new Date(params.value);
+        const date = new Date(value);
         const isRecent = date > new Date(Date.now() - 24 * 60 * 60 * 1000);
 
         return (
@@ -119,8 +120,8 @@ export default function AdminManagement() {
       field: "createdAt",
       headerName: "Created",
       width: 150,
-      cellRenderer: (params: any) => {
-        const date = new Date(params.value);
+      cellRenderer: (value: any) => {
+        const date = new Date(value);
         return (
           <div className="text-slate-600 dark:text-slate-400">
             <div className="text-sm font-medium">
@@ -252,7 +253,7 @@ export default function AdminManagement() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <DataTable<AdminUser>
+        <CustomDataTable
           key={refreshKey}
           columns={columns}
           endpoint="/api/admin/settings/admins"

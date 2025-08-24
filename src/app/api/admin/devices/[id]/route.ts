@@ -263,7 +263,9 @@ export async function GET(
         phone: userPopulated?.phone,
       },
       license: {
-        _id: (licensePopulated?._id as any)?.toString?.() || String(device.licenseId),
+        _id:
+          (licensePopulated?._id as any)?.toString?.() ||
+          String(device.licenseId),
         licenseKey: licensePopulated?.licenseKey,
         status: licensePopulated?.status,
         plan: licensePopulated?.plan,
@@ -301,7 +303,9 @@ export async function GET(
         message: "Failed to fetch device details",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }

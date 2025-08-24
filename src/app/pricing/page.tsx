@@ -162,8 +162,8 @@ export default function PricingPage() {
                     {plan.id === "monthly"
                       ? "📅"
                       : plan.id === "quarterly"
-                      ? "📊"
-                      : "🏆"}
+                        ? "📊"
+                        : "🏆"}
                   </span>
                 </div>
               </div>

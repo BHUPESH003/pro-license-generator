@@ -17,9 +17,10 @@ import {
   CheckCircle,
 } from "lucide-react";
 import AdminProtection from "@/components/admin/AdminProtection";
-import { DataTable } from "@/components/admin/DataTable";
+import { CustomDataTable } from "@/components/ui/CustomDataTable";
+import { DataTableColumn } from "@/components/ui/CustomDataTable.types";
 import DeviceDetailDrawer from "@/components/admin/DeviceDetailDrawer";
-import { FilterConfig, ActionConfig } from "@/components/admin/types";
+import { FilterConfig, ActionConfig } from "@/components/ui/CustomDataTable.types";
 import { Button } from "@/components/ui/Button";
 import apiClient from "@/lib/axios";
 
@@ -54,16 +55,16 @@ export default function DevicesPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   // DataTable columns configuration
-  const columns = [
+  const columns: DataTableColumn[] = [
     {
       field: "name",
       headerName: "Device Name",
       width: 200,
-      pinned: "left" as const,
-      cellRenderer: (params: any) => (
+      pinned: "left",
+      cellRenderer: (value: any) => (
         <div className="flex items-center gap-2">
           <Monitor className="h-4 w-4 text-slate-500" />
-          <span className="font-medium">{params.value}</span>
+          <span className="font-medium">{value}</span>
         </div>
       ),
     },
@@ -71,8 +72,8 @@ export default function DevicesPage() {
       field: "status",
       headerName: "Status",
       width: 120,
-      cellRenderer: (params: any) => {
-        const status = params.value;
+      cellRenderer: (value: any) => {
+        const status = value;
         const isActive = status === "active";
         return (
           <div
@@ -96,10 +97,10 @@ export default function DevicesPage() {
       field: "os",
       headerName: "Operating System",
       width: 150,
-      cellRenderer: (params: any) => (
+      cellRenderer: (value: any) => (
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span>{params.value}</span>
+          <span>{value}</span>
         </div>
       ),
     },
@@ -107,9 +108,9 @@ export default function DevicesPage() {
       field: "deviceGuid",
       headerName: "Device GUID",
       width: 200,
-      cellRenderer: (params: any) => (
+      cellRenderer: (value: any) => (
         <span className="font-mono text-sm text-slate-600 dark:text-slate-400">
-          {params.value || "N/A"}
+          {value || "N/A"}
         </span>
       ),
     },
@@ -117,39 +118,38 @@ export default function DevicesPage() {
       field: "user.email",
       headerName: "User Email",
       width: 200,
-      valueGetter: (params: any) => params.data.user?.email,
+      valueGetter: (row: Device) => row.user?.email,
     },
     {
       field: "user.name",
       headerName: "User Name",
       width: 150,
-      valueGetter: (params: any) => params.data.user?.name || "N/A",
+      valueGetter: (row: Device) => row.user?.name || "N/A",
     },
     {
       field: "license.licenseKey",
       headerName: "License Key",
       width: 180,
-      valueGetter: (params: any) => params.data.license?.licenseKey,
-      cellRenderer: (params: any) => (
-        <span className="font-mono text-sm">{params.value}</span>
+      valueGetter: (row: Device) => row.license?.licenseKey,
+      cellRenderer: (value: any) => (
+        <span className="font-mono text-sm">{value}</span>
       ),
     },
     {
       field: "license.plan",
       headerName: "License Plan",
       width: 120,
-      valueGetter: (params: any) => params.data.license?.plan,
+      valueGetter: (row: Device) => row.license?.plan,
     },
     {
       field: "telemetryStats.totalEvents",
       headerName: "Events",
       width: 100,
-      valueGetter: (params: any) =>
-        params.data.telemetryStats?.totalEvents || 0,
-      cellRenderer: (params: any) => (
+      valueGetter: (row: Device) => row.telemetryStats?.totalEvents || 0,
+      cellRenderer: (value: any) => (
         <div className="text-center">
           <span className="inline-flex items-center justify-center w-8 h-6 bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-400 rounded text-xs font-medium">
-            {params.value}
+            {value}
           </span>
         </div>
       ),
@@ -158,8 +158,8 @@ export default function DevicesPage() {
       field: "lastActivity",
       headerName: "Last Activity",
       width: 150,
-      cellRenderer: (params: any) => {
-        const date = new Date(params.value);
+      cellRenderer: (value: any) => {
+        const date = new Date(value);
         const isRecent = date > new Date(Date.now() - 24 * 60 * 60 * 1000); // Last 24 hours
 
         return (
@@ -185,10 +185,9 @@ export default function DevicesPage() {
       field: "telemetryStats.recentEventTypes",
       headerName: "Recent Events",
       width: 180,
-      valueGetter: (params: any) =>
-        params.data.telemetryStats?.recentEventTypes || [],
-      cellRenderer: (params: any) => {
-        const eventTypes = params.value || [];
+      valueGetter: (row: Device) => row.telemetryStats?.recentEventTypes || [],
+      cellRenderer: (value: any) => {
+        const eventTypes = value || [];
         if (eventTypes.length === 0)
           return <span className="text-slate-400">None</span>;
 
@@ -399,7 +398,7 @@ export default function DevicesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <DataTable<Device>
+          <CustomDataTable
             key={refreshKey}
             columns={columns}
             endpoint="/api/admin/devices"

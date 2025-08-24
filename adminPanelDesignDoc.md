@@ -166,7 +166,6 @@ All endpoints accept server‑side table params: `page`, `pageSize`, `sortBy`, `
 **Dashboard**
 
 - `GET /api/admin/metrics/overview?from&to`
-
   - returns: usersTotal, usersNew, licensesActive, licensesInactive, planRatio, modeRatio, dailyActiveDevices\[], dailyScanCounts\[]
 
 **Licenses**

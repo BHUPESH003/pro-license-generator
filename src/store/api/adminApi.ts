@@ -74,10 +74,13 @@ export const adminApi = createApi({
           pageSize: pageSize.toString(),
           sortBy,
           sortDir,
-          ...Object.entries(filters).reduce((acc, [key, value]) => {
-            if (value) acc[`filter_${key}`] = value;
-            return acc;
-          }, {} as Record<string, string>),
+          ...Object.entries(filters).reduce(
+            (acc, [key, value]) => {
+              if (value) acc[`filter_${key}`] = value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
         });
         return `licenses?${params}`;
       },
@@ -134,10 +137,13 @@ export const adminApi = createApi({
           pageSize: pageSize.toString(),
           sortBy,
           sortDir,
-          ...Object.entries(filters).reduce((acc, [key, value]) => {
-            if (value) acc[`filter_${key}`] = value;
-            return acc;
-          }, {} as Record<string, string>),
+          ...Object.entries(filters).reduce(
+            (acc, [key, value]) => {
+              if (value) acc[`filter_${key}`] = value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
         });
         return `devices?${params}`;
       },
@@ -194,10 +200,13 @@ export const adminApi = createApi({
           pageSize: pageSize.toString(),
           sortBy,
           sortDir,
-          ...Object.entries(filters).reduce((acc, [key, value]) => {
-            if (value) acc[`filter_${key}`] = value;
-            return acc;
-          }, {} as Record<string, string>),
+          ...Object.entries(filters).reduce(
+            (acc, [key, value]) => {
+              if (value) acc[`filter_${key}`] = value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
         });
         return `users?${params}`;
       },
@@ -254,10 +263,13 @@ export const adminApi = createApi({
           pageSize: pageSize.toString(),
           sortBy,
           sortDir,
-          ...Object.entries(filters).reduce((acc, [key, value]) => {
-            if (value) acc[`filter_${key}`] = value;
-            return acc;
-          }, {} as Record<string, string>),
+          ...Object.entries(filters).reduce(
+            (acc, [key, value]) => {
+              if (value) acc[`filter_${key}`] = value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
         });
         return `telemetry?${params}`;
       },
@@ -301,10 +313,13 @@ export const adminApi = createApi({
           pageSize: pageSize.toString(),
           sortBy,
           sortDir,
-          ...Object.entries(filters).reduce((acc, [key, value]) => {
-            if (value) acc[`filter_${key}`] = value;
-            return acc;
-          }, {} as Record<string, string>),
+          ...Object.entries(filters).reduce(
+            (acc, [key, value]) => {
+              if (value) acc[`filter_${key}`] = value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
         });
         return `audit?${params}`;
       },
@@ -386,10 +401,13 @@ export const adminApi = createApi({
         const params = new URLSearchParams({
           page: page.toString(),
           pageSize: pageSize.toString(),
-          ...Object.entries(filters).reduce((acc, [key, value]) => {
-            if (value) acc[`filter_${key}`] = value;
-            return acc;
-          }, {} as Record<string, string>),
+          ...Object.entries(filters).reduce(
+            (acc, [key, value]) => {
+              if (value) acc[`filter_${key}`] = value;
+              return acc;
+            },
+            {} as Record<string, string>
+          ),
         });
         return `settings/admins?${params}`;
       },

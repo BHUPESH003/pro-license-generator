@@ -163,7 +163,10 @@ export function InteractiveChart({
                   stroke={colors[index % colors.length]}
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  activeDot={{ r: 6, onClick: (e: any) => onDataPointClick?.(e?.payload) }}
+                  activeDot={{
+                    r: 6,
+                    onClick: (e: any) => onDataPointClick?.(e?.payload),
+                  }}
                 />
               ))
             ) : (
@@ -173,7 +176,10 @@ export function InteractiveChart({
                 stroke={color}
                 strokeWidth={2}
                 dot={{ r: 4 }}
-                activeDot={{ r: 6, onClick: (e: any) => onDataPointClick?.(e?.payload) }}
+                activeDot={{
+                  r: 6,
+                  onClick: (e: any) => onDataPointClick?.(e?.payload),
+                }}
               />
             )}
           </LineChart>

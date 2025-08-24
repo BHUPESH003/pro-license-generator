@@ -308,7 +308,9 @@ export async function GET(request: NextRequest) {
         message: "Failed to fetch license statistics",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }

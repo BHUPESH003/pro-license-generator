@@ -260,12 +260,15 @@ export async function GET(request: NextRequest) {
       currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
     }
 
-    const activityTrendsData: { date: string; activeDevices: number; newDevices: number }[] =
-      dateRange.map((date) => ({
-        date,
-        activeDevices: (activeDevicesMap.get(date) as number) || 0,
-        newDevices: (newDevicesMap.get(date) as number) || 0,
-      }));
+    const activityTrendsData: {
+      date: string;
+      activeDevices: number;
+      newDevices: number;
+    }[] = dateRange.map((date) => ({
+      date,
+      activeDevices: (activeDevicesMap.get(date) as number) || 0,
+      newDevices: (newDevicesMap.get(date) as number) || 0,
+    }));
 
     // Process telemetry stats
     const telemetryData = telemetryStats[0];
@@ -325,7 +328,9 @@ export async function GET(request: NextRequest) {
         message: "Failed to fetch device statistics",
         error:
           process.env.NODE_ENV === "development"
-            ? (error instanceof Error ? error.message : String(error))
+            ? error instanceof Error
+              ? error.message
+              : String(error)
             : undefined,
       },
       { status: 500 }

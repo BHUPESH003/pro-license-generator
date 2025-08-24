@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import apiClient from "@/lib/axios";
-import { EntityDrawer } from "./EntityDrawer";
 
 interface UserDetail {
   user: {
@@ -122,10 +121,13 @@ export default function UserDetailDrawer({
     if (!userId) return;
 
     try {
-      const { data } = await apiClient.post(`/api/admin/users/${userId}/actions`, {
-        action,
-        ...payload,
-      });
+      const { data } = await apiClient.post(
+        `/api/admin/users/${userId}/actions`,
+        {
+          action,
+          ...payload,
+        }
+      );
       if (!data.success) {
         throw new Error(data.message || `Failed to ${action}`);
       }
@@ -541,82 +543,124 @@ export default function UserDetailDrawer({
     );
   };
 
-  const actions = [
-    {
-      label: "Change Role",
-      onClick: handleRoleChange,
-      variant: "secondary" as const,
-    },
-    {
-      label: "Reset Password",
-      onClick: () => {
-        const newPassword = prompt("Enter new password (min 8 characters):");
-        if (newPassword && newPassword.length >= 8) {
-          handleQuickAction("reset_password", { newPassword });
-        }
-      },
-      variant: "secondary" as const,
-    },
-  ];
-
   return (
-    <EntityDrawer
-      isOpen={isOpen}
-      onClose={onClose}
-      title={userDetail ? `User: ${userDetail.user.email}` : "User Details"}
-      actions={actions}
-    >
-      {loading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      )}
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={onClose}
+          />
 
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-          <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
-            <AlertCircle className="h-5 w-5" />
-            <span>Error loading user details: {error}</span>
-          </div>
-        </div>
-      )}
+          {/* Drawer */}
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-slate-800 shadow-2xl z-50 overflow-hidden flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                  {userDetail ? `User: ${userDetail.user.email}` : "User Details"}
+                </h2>
+              </div>
+              <Button variant="secondary" size="sm" onClick={onClose} className="p-2">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
 
-      {userDetail && (
-        <div className="space-y-6">
-          {/* Tabs */}
-          <div className="border-b border-slate-200 dark:border-slate-700">
-            <nav className="-mb-px flex space-x-8">
-              {[
-                { id: "overview", label: "Overview", icon: User },
-                { id: "licenses", label: "Licenses", icon: Key },
-                { id: "devices", label: "Devices", icon: Smartphone },
-                { id: "audit", label: "Audit Logs", icon: Activity },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                      : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                  }`}
-                >
-                  <tab.icon className="h-4 w-4" />
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              )}
 
-          {/* Tab Content */}
-          <div className="min-h-[400px]">
-            {activeTab === "overview" && renderOverview()}
-            {activeTab === "licenses" && renderLicenses()}
-            {activeTab === "devices" && renderDevices()}
-            {activeTab === "audit" && renderAuditLogs()}
-          </div>
-        </div>
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                    <AlertCircle className="h-5 w-5" />
+                    <span>Error loading user details: {error}</span>
+                  </div>
+                </div>
+              )}
+
+              {userDetail && (
+                <div className="space-y-6">
+                  {/* Tabs */}
+                  <div className="border-b border-slate-200 dark:border-slate-700">
+                    <nav className="-mb-px flex space-x-8">
+                      {[
+                        { id: "overview", label: "Overview", icon: User },
+                        { id: "licenses", label: "Licenses", icon: Key },
+                        { id: "devices", label: "Devices", icon: Smartphone },
+                        { id: "audit", label: "Audit Logs", icon: Activity },
+                      ].map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id as any)}
+                          className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                            activeTab === tab.id
+                              ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                              : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                          }`}
+                        >
+                          <tab.icon className="h-4 w-4" />
+                          {tab.label}
+                        </button>
+                      ))}
+                    </nav>
+                  </div>
+
+                  {/* Tab Content */}
+                  <div className="min-h-[400px]">
+                    {activeTab === "overview" && renderOverview()}
+                    {activeTab === "licenses" && renderLicenses()}
+                    {activeTab === "devices" && renderDevices()}
+                    {activeTab === "audit" && renderAuditLogs()}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer actions */}
+            {userDetail && (
+              <div className="border-t border-slate-200 dark:border-slate-700 p-6">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Button variant="secondary" onClick={handleRoleChange} className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Change Role to {(userDetail.user.role || "user") === "admin" ? "User" : "Admin"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      const newPassword = prompt("Enter new password (min 8 characters):");
+                      if (newPassword && newPassword.length >= 8) {
+                        handleQuickAction("reset_password", { newPassword });
+                      }
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Key className="h-4 w-4" />
+                    Reset Password
+                  </Button>
+                  <Button variant="secondary" onClick={onClose} className="ml-auto">
+                    Close
+                  </Button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </>
       )}
-    </EntityDrawer>
+    </AnimatePresence>
   );
 }

@@ -76,6 +76,7 @@ export const EntityDrawer: React.FC<EntityDrawerProps> = ({
           transform transition-transform duration-300 ease-in-out
           ${getWidthClass()}
           ${isOpen ? "translate-x-0" : "translate-x-full"}
+          max-w-full
         `}
       >
         {/* Header */}

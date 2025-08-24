@@ -140,9 +140,12 @@ export function useAdminMetrics(
 
   // Auto-refresh every 5 minutes
   useEffect(() => {
-    const interval = setInterval(() => {
-      refreshMetrics();
-    }, 5 * 60 * 1000); // 5 minutes
+    const interval = setInterval(
+      () => {
+        refreshMetrics();
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
 
     return () => clearInterval(interval);
   }, [refreshMetrics]);

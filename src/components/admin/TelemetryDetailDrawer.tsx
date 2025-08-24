@@ -101,10 +101,10 @@ export default function TelemetryDetailDrawer({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl z-50 overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-slate-800 shadow-2xl z-50 overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   Telemetry Event Details
@@ -117,7 +117,7 @@ export default function TelemetryDetailDrawer({
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {/* Event Information */}
               <Card className="p-4">
                 <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
