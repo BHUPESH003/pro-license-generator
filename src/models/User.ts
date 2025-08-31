@@ -14,6 +14,7 @@ export interface UserAddress {
 }
 
 export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;
   email: string;
   password?: string;
   license?: ILicense | mongoose.Types.ObjectId; // Reference to License

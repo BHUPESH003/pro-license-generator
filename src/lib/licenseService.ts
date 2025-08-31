@@ -21,7 +21,7 @@ export interface CreateLicensesResult {
 export async function createLicenses(
   userId: mongoose.Types.ObjectId,
   subscriptionId: string | null,
-  customerId: Stripe.Customer,
+  customerId: string,
   plan: string,
   qty: number
 ): Promise<CreateLicensesResult> {

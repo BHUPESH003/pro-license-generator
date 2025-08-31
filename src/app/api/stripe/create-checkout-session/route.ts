@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import stripe from "@/lib/stripe";
+import dbConnect from "@/lib/db";
+import User from "@/models/User";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +37,9 @@ export async function POST(req: NextRequest) {
 
       if (!priceId) {
         throw new Error(
-          `Missing Stripe ${mode === "payment" ? "one-time" : "recurring"} price ID for plan: ${p}`
+          `Missing Stripe ${
+            mode === "payment" ? "one-time" : "recurring"
+          } price ID for plan: ${p}`
         );
       }
       const qty = Math.max(1, Number(q || 1));
@@ -131,16 +135,21 @@ export async function POST(req: NextRequest) {
       // For now, rely on Checkout to create one via customer_creation.
     } catch {}
 
-    const session = await stripe.checkout.sessions.create({
+    // Try to resolve an existing Stripe customer for subscriptions
+    let customerId: string | undefined = undefined;
+    try {
+      await dbConnect();
+      const user = await User.findOne({ email: userEmail }).lean();
+      if (user?.stripeCustomerId) customerId = user.stripeCustomerId;
+    } catch {}
+
+    const basePayload: any = {
       payment_method_types: ["card"],
       mode,
       line_items: lineItems,
       allow_promotion_codes: true,
       billing_address_collection: "required",
-      customer_creation: "always",
       phone_number_collection: { enabled: true },
-      customer_email: userEmail,
-      // customer, // pass when available
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/licenses?success=1`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/licenses?canceled=1`,
       metadata: {
@@ -151,7 +160,24 @@ export async function POST(req: NextRequest) {
             : plan,
         licenseId: licenseId || "",
       },
-    });
+    };
+
+    // Stripe rules:
+    // - customer_creation can only be used in payment mode.
+    // - For subscription mode, pass an existing customer if available.
+    if (mode === "payment") {
+      basePayload.customer_creation = "always";
+      basePayload.invoice_creation = {
+        enabled: true,
+      };
+      basePayload.customer_email = userEmail; // Only for payment mode
+    } else if (mode === "subscription" && customerId) {
+      basePayload.customer = customerId; // Only for subscription mode with existing customer
+    } else if (mode === "subscription" && !customerId) {
+      basePayload.customer_email = userEmail; // Fallback if no customerId
+    }
+
+    const session = await stripe.checkout.sessions.create(basePayload);
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
