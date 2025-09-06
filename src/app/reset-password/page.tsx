@@ -13,7 +13,38 @@ function ResetPasswordForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [strength, setStrength] = useState<string>("");
   const router = useRouter();
+
+  const checkStrength = (pwd: string) => {
+    const rules = [
+      /[a-z]/.test(pwd),
+      /[A-Z]/.test(pwd),
+      /\d/.test(pwd),
+      /[^A-Za-z0-9]/.test(pwd),
+      pwd.length >= 8,
+    ];
+    const score = rules.filter(Boolean).length;
+    if (pwd.length === 0) return "";
+    if (score <= 2) return "weak";
+    if (score === 3 || score === 4) return "medium";
+    return "strong";
+  };
+
+  const validatePolicy = (pwd: string) => {
+    return (
+      /[a-z]/.test(pwd) &&
+      /[A-Z]/.test(pwd) &&
+      /\d/.test(pwd) &&
+      /[^A-Za-z0-9]/.test(pwd) &&
+      pwd.length >= 8
+    );
+  };
+
+  const onPasswordChange = (v: string) => {
+    setPassword(v);
+    setStrength(checkStrength(v));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +52,12 @@ function ResetPasswordForm() {
     setSuccess("");
     if (!password || password !== confirm) {
       setError("Passwords do not match.");
+      return;
+    }
+    if (!validatePolicy(password)) {
+      setError(
+        "Password must be at least 8 chars with upper, lower, number, and symbol."
+      );
       return;
     }
     setLoading(true);
@@ -43,9 +80,24 @@ function ResetPasswordForm() {
           type="password"
           placeholder="New Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => onPasswordChange(e.target.value)}
           required
         />
+        {password.length > 0 && (
+          <div className="text-xs mt-1">
+            <span
+              className={
+                strength === "strong"
+                  ? "text-green-600"
+                  : strength === "medium"
+                  ? "text-yellow-600"
+                  : "text-red-600"
+              }
+            >
+              Strength: {strength}
+            </span>
+          </div>
+        )}
         <Input
           type="password"
           placeholder="Confirm Password"
@@ -53,6 +105,9 @@ function ResetPasswordForm() {
           onChange={(e) => setConfirm(e.target.value)}
           required
         />
+        <div className="text-xs text-[var(--foreground)]/70">
+          Must include: 8+ chars, upper, lower, number, symbol.
+        </div>
         {error && <div className="text-[var(--error)] text-sm">{error}</div>}
         {success && (
           <div className="text-[var(--success)] text-sm">{success}</div>

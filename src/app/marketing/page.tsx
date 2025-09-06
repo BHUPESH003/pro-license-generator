@@ -6,9 +6,43 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import apiClient from "@/lib/axios";
+import { Modal } from "@/components/ui/Modal";
+import { useRouter } from "next/navigation";
+
+const downloads = [
+  {
+    os: "Windows",
+    version: "2.1.0",
+    date: "2024-06-30",
+    url: "/downloads/proapp-windows.exe",
+  },
+  {
+    os: "macOS",
+    version: "2.1.0",
+    date: "2024-06-30",
+    url: "/downloads/proapp-macos.dmg",
+  },
+  {
+    os: "Linux",
+    version: "2.1.0",
+    date: "2024-06-30",
+    url: "/downloads/proapp-linux.AppImage",
+  },
+];
+
+function detectOS() {
+  if (typeof window === "undefined") return null;
+  const { userAgent } = window.navigator;
+  if (/Windows/i.test(userAgent)) return "Windows";
+  if (/Mac/i.test(userAgent)) return "macOS";
+  if (/Linux/i.test(userAgent)) return "Linux";
+  return null;
+}
 
 export default function MarketingLandingPage() {
   const [loading, setLoading] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const router = useRouter();
 
   const handleBuyPro = async () => {
     setLoading(true);
@@ -22,6 +56,20 @@ export default function MarketingLandingPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = () => {
+    const os = detectOS();
+    const entry = downloads.find((d) => d.os === os) || downloads[0];
+    if (entry) {
+      const anchor = document.createElement("a");
+      anchor.href = entry.url;
+      anchor.download = "";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    }
+    setIsDownloadModalOpen(true);
   };
 
   const containerVariants = {
@@ -106,6 +154,18 @@ export default function MarketingLandingPage() {
                 Login
               </Button>
             </Link>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              size="lg"
+              className="text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-purple-700"
+              onClick={handleDownload}
+            >
+              Download
+            </Button>
           </motion.div>
         </motion.div>
       </motion.section>
@@ -422,6 +482,30 @@ export default function MarketingLandingPage() {
           </Link>
         </motion.div>
       </motion.section>
+      <Modal isOpen={isDownloadModalOpen} onClose={() => setIsDownloadModalOpen(false)}>
+        <div className="text-center space-y-4">
+          <div className="text-2xl font-bold text-slate-900 dark:text-white">Thanks for downloading!</div>
+          <div className="text-slate-700 dark:text-slate-300">
+            You haven't purchased a license yet. Please login to continue.
+          </div>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <Button
+              variant="primary"
+              onClick={() => router.push("/login")}
+              className="px-6"
+            >
+              Go to Login
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setIsDownloadModalOpen(false)}
+              className="px-6"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </motion.div>
   );
 }

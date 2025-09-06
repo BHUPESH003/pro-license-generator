@@ -41,13 +41,18 @@ export default function LicensesPage() {
     licenseId?: string,
     quantityOverride?: number
   ) => {
-    const res = await apiClient.post("/api/stripe/create-checkout-session", {
-      plan,
-      quantity: quantityOverride || 1,
-      mode,
-      licenseId,
-    });
-    window.location.href = res.data.url;
+    try {
+      setActionLoading(`${mode}:${licenseId || "new"}`);
+      const res = await apiClient.post("/api/stripe/create-checkout-session", {
+        plan,
+        quantity: quantityOverride || 1,
+        mode,
+        licenseId,
+      });
+      window.location.href = res.data.url;
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   return (
@@ -93,7 +98,7 @@ export default function LicensesPage() {
             )
           }
         >
-          Subscribe
+          {actionLoading === `subscription:new` ? "Loading..." : "Subscribe"}
         </Button>
         <Button
           size="md"
@@ -109,7 +114,7 @@ export default function LicensesPage() {
             )
           }
         >
-          Pay now
+          {actionLoading === `payment:new` ? "Loading..." : "Pay now"}
         </Button>
       </div>
       {loading ? (
@@ -234,7 +239,7 @@ export default function LicensesPage() {
                       )
                     }
                   >
-                    Pay now
+                    {actionLoading === `payment:${lic._id}` ? "Loading..." : "Pay now"}
                   </Button>
                   <Button
                     size="sm"
@@ -247,7 +252,7 @@ export default function LicensesPage() {
                       )
                     }
                   >
-                    Setup mandate
+                    {actionLoading === `subscription:${lic._id}` ? "Loading..." : "Setup mandate"}
                   </Button>
                 </div>
               )}

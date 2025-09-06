@@ -549,7 +549,10 @@ export default function MarketingLayout({
                       />
                     </svg>
                   </div>
-                  <span className="text-base">Gurugram, India</span>
+                  <div className="flex flex-col">
+                    <span className="text-base font-medium">Gurugram, India</span>
+                    <span className="text-base font-medium">Delaware, USA</span>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>

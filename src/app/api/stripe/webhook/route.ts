@@ -19,6 +19,7 @@ import {
   updateLicensesExpiry,
   deactivateLicenses,
 } from "@/lib/licenseService";
+import { addMonths as addMonthsEOM, addQuarters as addQuartersEOM, addYears as addYearsEOM } from "@/lib/dateUtils";
 
 export const config = {
   api: { bodyParser: false },
@@ -51,6 +52,28 @@ interface PaymentFailureEmailPayload {
       hosted_invoice_url?: string;
     };
   };
+}
+
+// Helper to add time intervals when we must approximate a period end
+function addInterval(
+  start: Date,
+  interval: "day" | "week" | "month" | "year",
+  count: number
+): Date {
+  const end = new Date(start.getTime());
+  switch (interval) {
+    case "day":
+      end.setDate(end.getDate() + count);
+      return end;
+    case "week":
+      end.setDate(end.getDate() + count * 7);
+      return end;
+    case "month":
+      return addMonthsEOM(start, count);
+    case "year":
+      return addYearsEOM(start, count);
+  }
+  return end;
 }
 
 // Helper to safely get metadata keys
@@ -117,17 +140,66 @@ async function upsertSubscription(
   userId: mongoose.Types.ObjectId
 ): Promise<void> {
   try {
-    // Prefer Subscription current_period_*; fallback to expanded latest_invoice
-    const cps = (subscription as any).current_period_start as number | undefined;
-    const cpe = (subscription as any).current_period_end as number | undefined;
+    // Prefer Subscription current_period_*; fallback to expanded latest_invoice and invoice lines
+    let cps = (subscription as any).current_period_start as number | undefined;
+    let cpe = (subscription as any).current_period_end as number | undefined;
 
     let periodStart: Date | null = cps ? new Date(cps * 1000) : null;
     let periodEnd: Date | null = cpe ? new Date(cpe * 1000) : null;
 
+    // Try latest_invoice from already-expanded object
     if ((!periodStart || !periodEnd) && subscription.latest_invoice && typeof subscription.latest_invoice !== "string") {
       const inv = subscription.latest_invoice as Stripe.Invoice;
-      if (!periodStart && inv.period_start) periodStart = new Date(inv.period_start * 1000);
-      if (!periodEnd && inv.period_end) periodEnd = new Date(inv.period_end * 1000);
+      if (!periodStart && (inv as any).period_start) periodStart = new Date((inv as any).period_start * 1000);
+      if (!periodEnd && (inv as any).period_end) periodEnd = new Date((inv as any).period_end * 1000);
+      if ((!periodStart || !periodEnd) && inv.lines?.data?.length) {
+        const first = inv.lines.data[0];
+        if (!periodStart && (first as any).period?.start) periodStart = new Date((first as any).period.start * 1000);
+        if (!periodEnd && (first as any).period?.end) periodEnd = new Date((first as any).period.end * 1000);
+      }
+    }
+
+    // As a fallback, fetch an expanded subscription with latest_invoice and lines
+    if (!periodStart || !periodEnd) {
+      try {
+        const expanded = await stripe.subscriptions.retrieve(subscription.id, {
+          expand: ["items.data.price", "latest_invoice", "latest_invoice.lines.data"],
+        });
+        cps = (expanded as any).current_period_start as number | undefined;
+        cpe = (expanded as any).current_period_end as number | undefined;
+        if (!periodStart && cps) periodStart = new Date(cps * 1000);
+        if (!periodEnd && cpe) periodEnd = new Date(cpe * 1000);
+        const inv = expanded.latest_invoice && typeof expanded.latest_invoice !== "string" ? (expanded.latest_invoice as Stripe.Invoice) : null;
+        if (inv) {
+          if (!periodStart && (inv as any).period_start) periodStart = new Date((inv as any).period_start * 1000);
+          if (!periodEnd && (inv as any).period_end) periodEnd = new Date((inv as any).period_end * 1000);
+          if ((!periodStart || !periodEnd) && inv.lines?.data?.length) {
+            const first = inv.lines.data[0];
+            if (!periodStart && (first as any).period?.start) periodStart = new Date((first as any).period.start * 1000);
+            if (!periodEnd && (first as any).period?.end) periodEnd = new Date((first as any).period.end * 1000);
+          }
+        }
+        // Update reference to subscription so downstream fields (items) are consistent
+        subscription = expanded as any;
+      } catch {}
+    }
+
+    // Last resort: approximate using price interval if we have a start
+    if (periodStart && !periodEnd) {
+      const firstItem = subscription.items?.data?.[0];
+      const recurring = (firstItem?.price as Stripe.Price)?.recurring;
+      if (recurring?.interval) {
+        periodEnd = addInterval(periodStart, recurring.interval as any, recurring.interval_count || 1);
+      }
+    }
+
+    // If periodEnd is same as periodStart (observed for subscription_create invoices), compute using price interval
+    if (periodStart && periodEnd && periodEnd.getTime() === periodStart.getTime()) {
+      const firstItem = subscription.items?.data?.[0];
+      const recurring = (firstItem?.price as Stripe.Price)?.recurring;
+      if (recurring?.interval) {
+        periodEnd = addInterval(periodStart, recurring.interval as any, recurring.interval_count || 1);
+      }
     }
 
     const latestInvoiceUrl =
@@ -173,6 +245,72 @@ async function upsertInvoice(
   userId: mongoose.Types.ObjectId
 ): Promise<void> {
   try {
+    // Ensure we have period start/end; derive from lines or fetch expanded invoice if missing
+    let periodStart: Date | null = (invoice as any).period_start
+      ? new Date((invoice as any).period_start * 1000)
+      : null;
+    let periodEnd: Date | null = (invoice as any).period_end
+      ? new Date((invoice as any).period_end * 1000)
+      : null;
+
+    if ((!periodStart || !periodEnd) && (invoice as any).lines?.data?.length) {
+      const first = (invoice as any).lines.data[0];
+      if (!periodStart && first?.period?.start) periodStart = new Date(first.period.start * 1000);
+      if (!periodEnd && first?.period?.end) periodEnd = new Date(first.period.end * 1000);
+    }
+
+    if (!periodStart || !periodEnd) {
+      try {
+        const expanded = await stripe.invoices.retrieve((invoice as any).id as string, {
+          expand: ["lines.data", "subscription"],
+        });
+        if (!periodStart && (expanded as any).period_start)
+          periodStart = new Date((expanded as any).period_start * 1000);
+        if (!periodEnd && (expanded as any).period_end)
+          periodEnd = new Date((expanded as any).period_end * 1000);
+        if ((!periodStart || !periodEnd) && (expanded as any).lines?.data?.length) {
+          const first = (expanded as any).lines.data[0];
+          if (!periodStart && first?.period?.start) periodStart = new Date(first.period.start * 1000);
+          if (!periodEnd && first?.period?.end) periodEnd = new Date(first.period.end * 1000);
+        }
+
+        // If still missing, try deriving from subscription current period
+        if ((!periodStart || !periodEnd) && (expanded as any).subscription) {
+          const subId = typeof (expanded as any).subscription === "string" ? (expanded as any).subscription : (expanded as any).subscription.id;
+          const sub = await stripe.subscriptions.retrieve(subId as string);
+          const cps = (sub as any).current_period_start as number | undefined;
+          const cpe = (sub as any).current_period_end as number | undefined;
+          if (!periodStart && cps) periodStart = new Date(cps * 1000);
+          if (!periodEnd && cpe) periodEnd = new Date(cpe * 1000);
+        }
+
+        // Update invoice reference for downstream fields
+        invoice = expanded as any;
+      } catch {}
+    }
+
+    // For initial subscription_create invoices where period bounds equal the created time, derive from subscription
+    if (invoice.billing_reason === "subscription_create" && periodStart && periodEnd && periodEnd.getTime() === periodStart.getTime()) {
+      try {
+        const subId = (invoice as any).subscription as string | undefined;
+        if (subId) {
+          const sub = await stripe.subscriptions.retrieve(subId, { expand: ["items.data.price"] });
+          const cps = (sub as any).current_period_start as number | undefined;
+          const cpe = (sub as any).current_period_end as number | undefined;
+          if (cps) periodStart = new Date(cps * 1000);
+          if (cpe) periodEnd = new Date(cpe * 1000);
+          // If still equal, compute via price interval
+          if (periodStart && periodEnd && periodEnd.getTime() === periodStart.getTime()) {
+            const firstItem = sub.items?.data?.[0];
+            const recurring = (firstItem?.price as Stripe.Price | undefined)?.recurring;
+            if (recurring?.interval) {
+              periodEnd = addInterval(periodStart, recurring.interval as any, recurring.interval_count || 1);
+            }
+          }
+        }
+      } catch {}
+    }
+
     // Stripe.Invoice does not have charge by default, so use optional chaining
     const charge = (invoice as any).charge as Stripe.Charge | undefined;
     const invoiceData: Partial<IBillingInvoice> = {
@@ -188,12 +326,8 @@ async function upsertInvoice(
       invoice_pdf: invoice.invoice_pdf,
       receipt_url: charge?.receipt_url,
       created: invoice.created ? new Date(invoice.created * 1000) : null,
-      period_start: invoice.period_start
-        ? new Date(invoice.period_start * 1000)
-        : null,
-      period_end: invoice.period_end
-        ? new Date(invoice.period_end * 1000)
-        : null,
+      period_start: periodStart,
+      period_end: periodEnd,
       subscription: (invoice as any).subscription as string,
     };
 
@@ -234,7 +368,6 @@ async function handleCheckoutSessionCompleted(
     // ...rest of your payment logic...
   }
   const invoice = session.invoice as Stripe.Invoice | null;
-  console.log("handleCheckoutSessionCompleted", session);
 
   let user = await User.findOne({ email });
   if (!user) {
@@ -413,10 +546,17 @@ async function handleInvoicePaid(
   if (!user) {
     throw new Error("User not found for invoice");
   }
-  await upsertInvoice(invoice, user._id);
+  // Ensure full invoice data for reliable period fields
+  let fullInvoice = invoice;
+  try {
+    fullInvoice = (await stripe.invoices.retrieve((invoice as any).id as string, {
+      expand: ["lines.data", "subscription"],
+    })) as Stripe.Invoice;
+  } catch {}
+  await upsertInvoice(fullInvoice, user._id);
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-    expand: ["items.data.price"],
+    expand: ["items.data.price", "latest_invoice", "latest_invoice.lines.data"],
   });
   await upsertSubscription(subscription as Stripe.Subscription, user._id);
 
@@ -666,6 +806,8 @@ export async function POST(req: NextRequest) {
 
     let eventData: WebhookEventData | null = null;
 
+    console.log("Stripe webhook received:", event.type);
+    console.log("Event data:", event.data.object);
     switch (event.type) {
       case "checkout.session.completed":
         eventData = await handleCheckoutSessionCompleted(
@@ -678,6 +820,57 @@ export async function POST(req: NextRequest) {
           event.data.object as Stripe.Invoice
         );
         break;
+      // Capture initial invoice at subscription creation
+      case "invoice.finalized": {
+        const invoice = event.data.object as Stripe.Invoice;
+        if (invoice.billing_reason === "subscription_create") {
+          const invoiceUser = (await User.findOne({
+            stripeCustomerId: invoice.customer as string,
+          })) as IUser | null;
+          if (invoiceUser) {
+            await upsertInvoice(invoice, invoiceUser._id);
+          }
+        }
+        const invoiceUser = (await User.findOne({
+          stripeCustomerId: invoice.customer as string,
+        })) as IUser | null;
+        if (invoiceUser) {
+          await upsertInvoice(invoice, invoiceUser._id);
+        }
+        break;
+      }
+
+      case "invoice.created": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const invoiceUser = (await User.findOne({
+          stripeCustomerId: invoice.customer as string,
+        })) as IUser | null;
+        if (invoiceUser) {
+          await upsertInvoice(invoice, invoiceUser._id);
+        }
+        break;
+      }
+
+      case "customer.subscription.created": {
+        const sub = event.data.object as Stripe.Subscription;
+        const user = await User.findOne({
+          stripeCustomerId: sub.customer as string,
+        });
+        if (user) {
+          await upsertSubscription(sub, user._id);
+          eventData = {
+            eventId: sub.id,
+            eventType: "customer.subscription.created",
+            userId: user._id.toString(),
+            email: user.email,
+            subscriptionId: sub.id,
+            customerId: sub.customer as string,
+          };
+        }
+        break;
+      }
+
+      // Other events are logged above; add specific handlers as needed
 
       case "customer.subscription.updated":
         eventData = await handleSubscriptionUpdated(

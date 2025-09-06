@@ -1,19 +1,27 @@
 export function addMonths(date: Date, months: number) {
-  const d = new Date(date);
+  // End-of-month aware month addition (Aug 31 + 1m => Sep 30)
+  const d = new Date(date.getTime());
+  const day = d.getDate();
+  d.setDate(1);
   d.setMonth(d.getMonth() + months);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
   return d;
 }
 
 export function addYears(date: Date, years: number) {
-  const d = new Date(date);
+  // End-of-month aware year addition (Feb 29 + 1y => Feb 28 on non-leap)
+  const d = new Date(date.getTime());
+  const day = d.getDate();
+  d.setDate(1);
   d.setFullYear(d.getFullYear() + years);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
   return d;
 }
 
 export function addQuarters(date: Date, quarters: number) {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + (quarters * 3));
-  return d;
+  return addMonths(date, quarters * 3);
 }
 
 /**
