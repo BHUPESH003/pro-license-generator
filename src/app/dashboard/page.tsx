@@ -11,6 +11,7 @@ import {
   Shield,
   Zap,
   ArrowRight,
+  CreditCard,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import apiClient from "@/lib/axios";
@@ -90,7 +91,7 @@ export default function DashboardHome() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12"
       >
         {/* Licenses Card */}
         <motion.div
@@ -164,6 +165,37 @@ export default function DashboardHome() {
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 <span>Manage Devices</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </motion.div>
+          </Link>
+        </motion.div>
+
+        {/* Billing Card */}
+        <motion.div
+          variants={itemVariants}
+          whileHover={{ scale: 1.02, y: -5 }}
+          className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-700/50 p-8"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <CreditCard className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+            Billing & Receipts
+          </h3>
+          <p className="text-slate-600 dark:text-slate-300 mb-6">
+            Manage your subscription and download past receipts.
+          </p>
+          <Link href="/dashboard/billing">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="lg"
+                variant="accent"
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <span>Open Billing</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </motion.div>

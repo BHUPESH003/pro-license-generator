@@ -15,6 +15,7 @@ import {
   X,
   Home,
   Mail,
+  CreditCard,
 } from "lucide-react";
 import logo from "@/assets/mycleanone_logo.png";
 
@@ -23,6 +24,7 @@ const sidebarLinks = [
   { href: "/dashboard/licenses", label: "My Licenses", icon: Key },
   { href: "/dashboard/devices", label: "My Devices", icon: Smartphone },
   { href: "/dashboard/downloads", label: "Downloads", icon: Download },
+  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
 ];
 
 async function handleLogout(router: any) {

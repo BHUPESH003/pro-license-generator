@@ -1,6 +1,6 @@
 import License, { ILicense } from "@/models/License";
 import { generateUniqueLicenseKey } from "@/lib/utils";
-import { addMonths, addYears } from "@/lib/dateUtils";
+import { addMonths, addYears, addQuarters } from "@/lib/dateUtils";
 import mongoose from "mongoose";
 import Stripe from "stripe";
 
@@ -21,16 +21,17 @@ export interface CreateLicensesResult {
 export async function createLicenses(
   userId: mongoose.Types.ObjectId,
   subscriptionId: string | null,
-  customerId: Stripe.Customer,
+  customerId: string,
   plan: string,
   qty: number
 ): Promise<CreateLicensesResult> {
+  const now = new Date();
   const expiryDate =
     plan === "yearly"
-      ? addYears(new Date(), 1)
+      ? addYears(now, 1)
       : plan === "quarterly"
-        ? addMonths(new Date(), 3)
-        : addMonths(new Date(), 1);
+        ? addQuarters(now, 1)
+        : addMonths(now, 1);
 
   const licenseKeys = [];
   const licensesToInsert = [];
@@ -57,12 +58,13 @@ export async function createLicenses(
 export async function updateLicensesExpiry(licenses: ILicense[]) {
   for (const lic of licenses) {
     lic.status = "active";
+    const base = new Date();
     lic.expiryDate =
       lic.plan === "yearly"
-        ? addYears(new Date(), 1)
+        ? addYears(base, 1)
         : lic.plan === "quarterly"
-          ? addMonths(new Date(), 3)
-          : addMonths(new Date(), 1);
+          ? addQuarters(base, 1)
+          : addMonths(base, 1);
     await lic.save();
   }
 }
