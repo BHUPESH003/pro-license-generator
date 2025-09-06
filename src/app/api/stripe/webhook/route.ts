@@ -806,8 +806,6 @@ export async function POST(req: NextRequest) {
 
     let eventData: WebhookEventData | null = null;
 
-    console.log("Stripe webhook received:", event.type);
-    console.log("Event data:", event.data.object);
     switch (event.type) {
       case "checkout.session.completed":
         eventData = await handleCheckoutSessionCompleted(
