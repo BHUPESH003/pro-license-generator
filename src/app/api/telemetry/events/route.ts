@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import License from "@/models/License";
 import TelemetryEvent from "@/models/TelemetryEvent";
+import { jwtVerify } from "jose";
 
 // POST: ingest telemetry events (public via licenseKey+deviceGuid)
 export async function POST(req: NextRequest) {
@@ -84,6 +85,19 @@ export async function POST(req: NextRequest) {
 // GET: retrieve telemetry events (public via licenseKey+deviceGuid)
 export async function GET(req: NextRequest) {
   try {
+    const authHeader = req.headers.get("authorization") || "";
+    let decode;
+    try {
+      decode = await jwtVerify(
+        authHeader,
+        new TextEncoder().encode(process.env.JWT_SECRET_APP!)
+      );
+    } catch {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    console.log("Decoded JWT:", decode);
+
+    // Query parameters
     const { searchParams } = new URL(req.url);
     const licenseKey = searchParams.get("licenseKey");
     const deviceGuid = searchParams.get("deviceGuid");
