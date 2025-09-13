@@ -1,17 +1,3 @@
-/** @type {import('jest').Config} */
-module.exports = {
-  testEnvironment: "node",
-  transform: {
-    "^.+\\.(ts|tsx)$": ["ts-jest", { tsconfig: { isolatedModules: true } }],
-  },
-  moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
-  },
-  transformIgnorePatterns: ["/node_modules/(?!(jose)/)"],
-  setupFilesAfterEnv: [],
-  testPathIgnorePatterns: ["/node_modules/", "/.next/"],
-};
-
 const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
@@ -22,7 +8,7 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-  testEnvironment: "jest-environment-jsdom",
+  testEnvironment: "node", // Use node environment for API tests
   testPathIgnorePatterns: [
     "<rootDir>/.next/",
     "<rootDir>/node_modules/",
@@ -31,6 +17,41 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
+  // Handle ES modules from node_modules
+  transformIgnorePatterns: [
+    "node_modules/(?!(bson|mongodb|mongoose|jose)/)"
+  ],
+  // Use different test environments based on test type
+  projects: [
+    {
+      displayName: "api-tests",
+      testEnvironment: "node",
+      testMatch: [
+        "<rootDir>/src/__tests__/api/**/*.test.{js,ts}",
+        "<rootDir>/src/__tests__/webhooks/**/*.test.{js,ts}",
+        "<rootDir>/src/__tests__/integration/**/*.test.{js,ts}",
+      ],
+      setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+      moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/src/$1",
+      },
+      transformIgnorePatterns: [
+        "node_modules/(?!(bson|mongodb|mongoose|jose)/)"
+      ],
+    },
+    {
+      displayName: "component-tests", 
+      testEnvironment: "jsdom",
+      testMatch: [
+        "<rootDir>/src/__tests__/components/**/*.test.{js,jsx,ts,tsx}",
+        "<rootDir>/src/__tests__/ui/**/*.test.{js,jsx,ts,tsx}",
+      ],
+      setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+      moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/src/$1",
+      },
+    },
+  ],
   collectCoverageFrom: [
     "src/**/*.{js,jsx,ts,tsx}",
     "!src/**/*.d.ts",

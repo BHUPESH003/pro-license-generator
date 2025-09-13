@@ -80,36 +80,44 @@ export async function POST(req: NextRequest) {
           { status: 409 }
         );
       }
-      existingDevice.name = name;
-      existingDevice.os = os;
-      existingDevice.lastActivity = new Date();
-      await existingDevice.save();
 
-      // Ensure license reflects binding
-      if (!license.deviceId) {
-        license.deviceId = deviceGuid;
-        if (license.status !== "active") license.status = "active";
-        await license.save();
+      // Check if this is the exact same activation request (same license + device)
+      if (existingLicenseId === currentLicenseId) {
+        // Update device info and last activity
+        existingDevice.name = name;
+        existingDevice.os = os;
+        existingDevice.lastActivity = new Date();
+        await existingDevice.save();
+
+        // Ensure license reflects binding
+        if (!license.deviceId) {
+          license.deviceId = deviceGuid;
+          if (license.status !== "active") license.status = "active";
+          await license.save();
+        }
+
+        // Return success but indicate it was already registered
+        return NextResponse.json({
+          success: true,
+          alreadyRegistered: true,
+          message: "License is already registered on this device",
+          user: { id: user._id, email: user.email, name: user.name },
+          license: {
+            id: license._id,
+            licenseKey: license.licenseKey,
+            status: license.status,
+            expiryDate: license.expiryDate,
+            plan: license.plan,
+          },
+          device: {
+            id: existingDevice._id,
+            deviceGuid: existingDevice.deviceGuid,
+            name: existingDevice.name,
+            os: existingDevice.os,
+            lastActivity: existingDevice.lastActivity,
+          },
+        });
       }
-
-      return NextResponse.json({
-        success: true,
-        user: { id: user._id, email: user.email, name: user.name },
-        license: {
-          id: license._id,
-          licenseKey: license.licenseKey,
-          status: license.status,
-          expiryDate: license.expiryDate,
-          plan: license.plan,
-        },
-        device: {
-          id: existingDevice._id,
-          deviceGuid: existingDevice.deviceGuid,
-          name: existingDevice.name,
-          os: existingDevice.os,
-          lastActivity: existingDevice.lastActivity,
-        },
-      });
     }
 
     // Create device and link license
@@ -130,6 +138,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      alreadyRegistered: false,
+      message: "License successfully registered on device",
       user: { id: user._id, email: user.email, name: user.name },
       license: {
         id: license._id,

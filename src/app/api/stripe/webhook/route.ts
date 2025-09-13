@@ -19,7 +19,7 @@ import {
   updateLicensesExpiry,
   deactivateLicenses,
 } from "@/lib/licenseService";
-import { addMonths as addMonthsEOM, addQuarters as addQuartersEOM, addYears as addYearsEOM } from "@/lib/dateUtils";
+import { addMonths, addYears } from "@/lib/dateUtils";
 
 export const config = {
   api: { bodyParser: false },
@@ -69,9 +69,9 @@ function addInterval(
       end.setDate(end.getDate() + count * 7);
       return end;
     case "month":
-      return addMonthsEOM(start, count);
+      return addMonths(start, count);
     case "year":
-      return addYearsEOM(start, count);
+      return addYears(start, count);
   }
   return end;
 }
@@ -395,16 +395,56 @@ async function handleCheckoutSessionCompleted(
 
     await upsertSubscription(subscription as Stripe.Subscription, user._id);
 
-    // 🆕 Use canonical createLicenses
-    const result = await createLicenses(
-      user._id,
-      subscriptionId,
-      customerId,
-      plan,
-      quantity
-    );
-    licenseKeys = result.licenseKeys;
-    expiryDate = result.expiryDate;
+    // Check if this is a renewal (converting from one-time to subscription)
+    if (licenseId && licenseId.length > 0) {
+      // This is a renewal - convert existing license to subscription
+      const existingLicense = await License.findById(licenseId);
+      if (!existingLicense) {
+        throw new Error(`License ${licenseId} not found for renewal`);
+      }
+      
+      // Verify the license belongs to this user
+      if (existingLicense.userId.toString() !== user._id.toString()) {
+        throw new Error(`License ${licenseId} does not belong to user ${user._id}`);
+      }
+      
+      // Update plan and subscription info before renewal
+      existingLicense.plan = plan;
+      existingLicense.stripeCustomerId = customerId;
+      existingLicense.stripeSubscriptionId = subscriptionId;
+      await existingLicense.save();
+      
+      // Use existing service function to renew the license
+      await updateLicensesExpiry([existingLicense]);
+      
+      licenseKeys = [existingLicense.licenseKey];
+      expiryDate = existingLicense.expiryDate;
+      action = "renewed";
+      
+      // If quantity > 1, create additional licenses
+      if (quantity > 1) {
+        const additionalResult = await createLicenses(
+          user._id,
+          subscriptionId,
+          customerId,
+          plan,
+          quantity - 1
+        );
+        licenseKeys.push(...additionalResult.licenseKeys);
+      }
+    } else {
+      // This is a new subscription - create new licenses
+      const result = await createLicenses(
+        user._id,
+        subscriptionId,
+        customerId,
+        plan,
+        quantity
+      );
+      licenseKeys = result.licenseKeys;
+      expiryDate = result.expiryDate;
+      action = "created";
+    }
 
     emailPayload = {
       email,
@@ -419,17 +459,30 @@ async function handleCheckoutSessionCompleted(
     };
   } else if (mode === "payment") {
     if (licenseId && licenseId.length > 0) {
-      // For renewal, use createLicenses with licenseId as a single-item array
-      const result = await createLicenses(
-        user._id,
-        null,
-        customerId,
-        plan,
-        quantity
-      );
-      licenseKeys = result.licenseKeys;
-      expiryDate = result.expiryDate;
+      // This is a renewal - renew the existing license
+      const existingLicense = await License.findById(licenseId);
+      if (!existingLicense) {
+        throw new Error(`License ${licenseId} not found for renewal`);
+      }
+      
+      // Verify the license belongs to this user
+      if (existingLicense.userId.toString() !== user._id.toString()) {
+        throw new Error(`License ${licenseId} does not belong to user ${user._id}`);
+      }
+      
+      // Update plan and customer info before renewal
+      existingLicense.plan = plan;
+      existingLicense.stripeCustomerId = customerId;
+      await existingLicense.save();
+      
+      // Use existing service function to renew the license
+      await updateLicensesExpiry([existingLicense]);
+      
+      licenseKeys = [existingLicense.licenseKey];
+      expiryDate = existingLicense.expiryDate;
+      action = "renewed";
     } else {
+      // This is a new purchase - create new licenses
       const result = await createLicenses(
         user._id,
         null,
@@ -439,6 +492,7 @@ async function handleCheckoutSessionCompleted(
       );
       licenseKeys = result.licenseKeys;
       expiryDate = result.expiryDate;
+      action = "created";
     }
 
     // Create BillingInvoice for one-time payment
@@ -536,16 +590,14 @@ async function handleInvoicePaid(
   }
   console.log("handleInvoicePaid", invoice);
   const subscriptionId = (invoice as any).subscription as string;
-  if (!subscriptionId) {
-    throw new Error("Invoice has no subscription");
-  }
-
+  
   const user = await User.findOne({
     stripeCustomerId: invoice.customer as string,
   });
   if (!user) {
     throw new Error("User not found for invoice");
   }
+  
   // Ensure full invoice data for reliable period fields
   let fullInvoice = invoice;
   try {
@@ -555,47 +607,64 @@ async function handleInvoicePaid(
   } catch {}
   await upsertInvoice(fullInvoice, user._id);
 
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-    expand: ["items.data.price", "latest_invoice", "latest_invoice.lines.data"],
-  });
-  await upsertSubscription(subscription as Stripe.Subscription, user._id);
-
-  // 🆕 Use canonical updateLicensesExpiry
-  const licenses = await License.find({ stripeSubscriptionId: subscriptionId });
-  if (licenses.length > 0) {
-    await updateLicensesExpiry(licenses);
-
-    const plan = licenses[0].plan;
-    const expiryDate = licenses[0].expiryDate;
-
-    const emailPayload: EmailPayload = {
-      email: user.email,
-      data: buildLicenseEmail({
-        user,
-        licenseKeys: licenses.map((l) => l.licenseKey),
-        status: "active",
-        plan,
-        expiryDate,
-        action: "renewed",
-      }),
-    };
-
-    await sendEmailToSQS({
-      email: emailPayload.email,
-      template: "renderLicenseKeyTemplate",
-      data: emailPayload.data,
+  // Handle subscription invoices (recurring payments)
+  if (subscriptionId) {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ["items.data.price", "latest_invoice", "latest_invoice.lines.data"],
     });
-  }
+    await upsertSubscription(subscription as Stripe.Subscription, user._id);
 
-  return {
-    eventId: invoice.id || "",
-    eventType: "invoice.paid",
-    userId: user._id.toString(),
-    email: user.email,
-    subscriptionId,
-    customerId: invoice.customer as string,
-    invoiceId: invoice.id,
-  };
+    // Renew subscription licenses
+    const licenses = await License.find({ stripeSubscriptionId: subscriptionId });
+    if (licenses.length > 0) {
+      await updateLicensesExpiry(licenses);
+
+      const plan = licenses[0].plan;
+      const expiryDate = licenses[0].expiryDate;
+
+      const emailPayload: EmailPayload = {
+        email: user.email,
+        data: buildLicenseEmail({
+          user,
+          licenseKeys: licenses.map((l) => l.licenseKey),
+          status: "active",
+          plan,
+          expiryDate,
+          action: "renewed",
+        }),
+      };
+
+      await sendEmailToSQS({
+        email: emailPayload.email,
+        template: "renderLicenseKeyTemplate",
+        data: emailPayload.data,
+      });
+    }
+
+    return {
+      eventId: invoice.id || "",
+      eventType: "invoice.paid (subscription)",
+      userId: user._id.toString(),
+      email: user.email,
+      subscriptionId,
+      customerId: invoice.customer as string,
+      invoiceId: invoice.id,
+    };
+  } else {
+    // Handle one-time payment invoices
+    // For one-time payments, license creation/renewal is handled in checkout.session.completed
+    // This invoice.paid event is just for record-keeping
+    console.log("One-time payment invoice processed for record-keeping");
+    
+    return {
+      eventId: invoice.id || "",
+      eventType: "invoice.paid (one-time)",
+      userId: user._id.toString(),
+      email: user.email,
+      customerId: invoice.customer as string,
+      invoiceId: invoice.id,
+    };
+  }
 }
 
 async function handleSubscriptionUpdated(
