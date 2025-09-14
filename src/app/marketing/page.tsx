@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
@@ -9,40 +9,51 @@ import apiClient from "@/lib/axios";
 import { Modal } from "@/components/ui/Modal";
 import { useRouter } from "next/navigation";
 
-const downloads = [
-  {
-    os: "Windows",
-    version: "2.1.0",
-    date: "2024-06-30",
-    url: "/downloads/proapp-windows.exe",
-  },
-  {
-    os: "macOS",
-    version: "2.1.0",
-    date: "2024-06-30",
-    url: "/downloads/proapp-macos.dmg",
-  },
-  {
-    os: "Linux",
-    version: "2.1.0",
-    date: "2024-06-30",
-    url: "/downloads/proapp-linux.AppImage",
-  },
-];
+interface AppVersion {
+  version: string;
+  url: string;
+}
 
 function detectOS() {
   if (typeof window === "undefined") return null;
   const { userAgent } = window.navigator;
   if (/Windows/i.test(userAgent)) return "Windows";
-  if (/Mac/i.test(userAgent)) return "macOS";
-  if (/Linux/i.test(userAgent)) return "Linux";
   return null;
 }
 
 export default function MarketingLandingPage() {
   const [loading, setLoading] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const [appVersion, setAppVersion] = useState<AppVersion | null>(null);
+  const [versionLoading, setVersionLoading] = useState(true);
   const router = useRouter();
+
+  // Fetch app version on component mount
+  useEffect(() => {
+    const fetchAppVersion = async () => {
+      try {
+        setVersionLoading(true);
+        const versionRes = await apiClient.get('/api/app-version');
+        if (versionRes.data.success) {
+          setAppVersion(versionRes.data.data);
+        } else {
+          // Use fallback data from API response
+          setAppVersion(versionRes.data.data);
+        }
+      } catch (fetchError) {
+        console.error('Failed to fetch app version:', fetchError);
+        // Fallback version - use direct S3 URL for download
+        setAppVersion({
+          version: "1.1.0",
+          url: 'https://pocpmli.s3.ap-south-1.amazonaws.com/mycleanone/MyCleanOnSetup.msi'
+        });
+      } finally {
+        setVersionLoading(false);
+      }
+    };
+
+    fetchAppVersion();
+  }, []);
 
   const handleBuyPro = async () => {
     setLoading(true);
@@ -59,11 +70,18 @@ export default function MarketingLandingPage() {
   };
 
   const handleDownload = () => {
-    const os = detectOS();
-    const entry = downloads.find((d) => d.os === os) || downloads[0];
-    if (entry) {
+    // Use the fetched app version if available, otherwise fallback
+    if (appVersion?.url) {
       const anchor = document.createElement("a");
-      anchor.href = entry.url;
+      anchor.href = appVersion.url;
+      anchor.download = "";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    } else {
+      // Fallback to default URL if version not loaded yet
+      const anchor = document.createElement("a");
+      anchor.href = 'https://pocpmli.s3.ap-south-1.amazonaws.com/mycleanone/MyCleanOnSetup.msi';
       anchor.download = "";
       document.body.appendChild(anchor);
       anchor.click();
@@ -163,8 +181,19 @@ export default function MarketingLandingPage() {
               size="lg"
               className="text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-purple-700"
               onClick={handleDownload}
+              disabled={versionLoading}
             >
-              Download
+              {versionLoading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Loading...
+                </span>
+              ) : (
+                `Download v${appVersion?.version || "1.1.0"}`
+              )}
             </Button>
           </motion.div>
         </motion.div>
@@ -482,10 +511,18 @@ export default function MarketingLandingPage() {
           </Link>
         </motion.div>
       </motion.section>
-      <Modal isOpen={isDownloadModalOpen} onClose={() => setIsDownloadModalOpen(false)}>
+      <Modal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+      >
         <div className="text-center space-y-4">
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">Thanks for downloading!</div>
+          <div className="text-2xl font-bold text-slate-900 dark:text-white">
+            Thanks for downloading!
+          </div>
           <div className="text-slate-700 dark:text-slate-300">
+            MyCleanOne v{appVersion?.version || "1.1.0"} is now downloading.
+          </div>
+          <div className="text-slate-600 dark:text-slate-400 text-sm">
             You haven't purchased a license yet. Please login to continue.
           </div>
           <div className="flex items-center justify-center gap-3 pt-2">

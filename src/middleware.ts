@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
     "/api/user/profile",
     "/api/telemetry/events",
     "/api/admin/users", // Demo endpoint for DataTable testing
+    "/api/app-version", // Public app version endpoint
   ];
 
   // Admin routes require admin role
